@@ -1,6 +1,4 @@
-const LinkIcon = () => (
-  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.2 13.8a4.5 4.5 0 0 0 6.36.06l2.3-2.3a4.5 4.5 0 0 0-6.36-6.36l-1.32 1.32M13.8 10.2a4.5 4.5 0 0 0-6.36-.06l-2.3 2.3a4.5 4.5 0 0 0 6.36 6.36l1.31-1.31" /></svg>
-);
+import UrlAnalyzer from "./components/url-analyzer";
 
 const LockIcon = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v2" /></svg>
@@ -8,10 +6,6 @@ const LockIcon = () => (
 
 const AlertIcon = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2.7 20h18.6L12 3Z" /><path d="M12 9v5M12 17.5v.1" /></svg>
-);
-
-const ArrowIcon = () => (
-  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M14 7l5 5-5 5" /></svg>
 );
 
 const BrandMark = () => (
@@ -42,14 +36,7 @@ export default function Home() {
             <div className="hero-privacy"><span><LockIcon /></span><div><strong>Private by default</strong><small>Nothing you check is saved.</small></div></div>
           </div>
 
-          <div className="analyzer-card" id="analyzer">
-            <form aria-label="URL analyzer preview">
-              <label className="analyzer-title" htmlFor="url">Check a link in seconds</label>
-              <div className="url-field"><LinkIcon /><input id="url" name="url" type="url" placeholder="Paste the suspicious URL here" disabled /></div>
-              <button type="button" disabled>Check link <ArrowIcon /></button>
-            </form>
-            <p className="preview-note"><LockIcon /> Interface preview · Real analysis arrives in Part 3</p>
-          </div>
+          <UrlAnalyzer />
         </div>
       </section>
 
@@ -90,7 +77,7 @@ export default function Home() {
       <footer>
         <a className="brand footer-brand" href="#top"><BrandMark /><span>CyberFish</span></a>
         <p>Clear evidence. Safer next steps.</p>
-        <div className="footer-links"><a href="#how-it-works">How it works</a><a href="#privacy">Privacy</a><span>Part 2 · UI foundation</span></div>
+        <div className="footer-links"><a href="#how-it-works">How it works</a><a href="#privacy">Privacy</a><span>Part 3A · Local URL checks</span></div>
       </footer>
     </main>
   );
