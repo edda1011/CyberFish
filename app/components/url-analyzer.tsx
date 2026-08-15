@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { analyzeUrlLocally } from "../../lib/analyze-url";
 import type { AnalysisResult } from "../../lib/analysis";
 
 const LinkIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.2 13.8a4.5 4.5 0 0 0 6.36.06l2.3-2.3a4.5 4.5 0 0 0-6.36-6.36l-1.32 1.32M13.8 10.2a4.5 4.5 0 0 0-6.36-.06l-2.3 2.3a4.5 4.5 0 0 0 6.36 6.36l1.31-1.31" /></svg>;
@@ -15,16 +14,31 @@ export default function UrlAnalyzer() {
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     setResult(null);
+    setIsLoading(true);
 
     try {
-      setResult(analyzeUrlLocally(value));
+      const response = await fetch("/api/analyze/url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: value }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error?.message ?? "The URL could not be checked. Try again.");
+      }
+
+      setResult(data as AnalysisResult);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "This URL could not be checked.");
+      setError(caught instanceof Error ? caught.message : "The URL could not be checked. Try again.");
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -32,9 +46,9 @@ export default function UrlAnalyzer() {
     <div className={`analyzer-card ${result ? "has-result" : ""}`} id="analyzer">
       <form aria-label="URL analyzer" onSubmit={submit} noValidate>
         <label className="analyzer-title" htmlFor="url">Check a link in seconds</label>
-        <div className={`url-field ${error ? "field-error" : ""}`}><LinkIcon /><input id="url" name="url" type="text" inputMode="url" autoCapitalize="none" autoCorrect="off" spellCheck="false" placeholder="Paste the suspicious URL here" value={value} onChange={(event) => setValue(event.target.value)} aria-describedby={error ? "url-error" : "url-help"} aria-invalid={Boolean(error)} /></div>
+        <div className={`url-field ${error ? "field-error" : ""}`}><LinkIcon /><input id="url" name="url" type="text" inputMode="url" autoCapitalize="none" autoCorrect="off" spellCheck="false" placeholder="Paste the suspicious URL here" value={value} onChange={(event) => setValue(event.target.value)} aria-describedby={error ? "url-error" : "url-help"} aria-invalid={Boolean(error)} disabled={isLoading} /></div>
         {error && <p className="form-error" id="url-error" role="alert">{error}</p>}
-        <button type="submit">Check link <ArrowIcon /></button>
+        <button type="submit" disabled={isLoading} aria-busy={isLoading}>{isLoading ? "Checking…" : "Check link"} {isLoading ? <span className="button-spinner" aria-hidden="true" /> : <ArrowIcon />}</button>
       </form>
       <p className="preview-note" id="url-help"><LockIcon /> Checked locally · Nothing is uploaded or saved</p>
 

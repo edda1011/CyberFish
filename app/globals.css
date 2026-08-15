@@ -61,7 +61,10 @@ h1 span { display: block; margin-top: 6px; color: var(--aqua); font-weight: 520;
 .analyzer-card button { width: 100%; min-height: 56px; margin-top: 14px; display: flex; align-items: center; justify-content: center; gap: 20px; border: 0; border-radius: 12px; background: var(--aqua); color: var(--navy-950); font-weight: 800; cursor: pointer; opacity: 1; box-shadow: 0 12px 28px rgba(36,207,201,.16); transition: background .2s ease, box-shadow .2s ease; }
 .analyzer-card button:hover { background: #78f0eb; box-shadow: 0 14px 32px rgba(36,207,201,.24); }
 .analyzer-card button:active { background: var(--aqua-strong); }
+.analyzer-card button:disabled { cursor: wait; background: #83cfcc; color: #173944; box-shadow: none; }
 .analyzer-card button svg { width: 19px; }
+.button-spinner { width: 17px; height: 17px; border: 2px solid rgba(4,23,45,.3); border-top-color: var(--navy-950); border-radius: 50%; animation: button-spin .7s linear infinite; }
+@keyframes button-spin { to { transform: rotate(360deg); } }
 .preview-note { margin: 15px 0 0; display: flex; align-items: center; justify-content: center; gap: 8px; color: #a7bbc9; font-size: 12px; text-align: center; }.preview-note svg { width: 14px; }
 .form-error { margin: 10px 2px 0; color: #ffb7b1; font-size: 13px; }
 
@@ -138,4 +141,5 @@ footer>p { color: var(--muted); font-size: 13px; }.footer-links { display: flex;
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .sonar { animation: none; }
+  .button-spinner { animation-duration: 1.4s; }
 }
