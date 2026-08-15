@@ -14,3 +14,4 @@ Open `http://localhost:3000` in your browser.
 ## Current progress
 
 - Part 1: Project foundation
+- Part 2: Responsive landing page UI
