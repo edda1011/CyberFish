@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+
+# Local development files
+.env*
+!.env.example
+*.tsbuildinfo
+
+# Logs and editor files
+*.log
+.DS_Store
+.vscode/
+
+# Previous local preview output
+.vinext/
+.vite/
+.wrangler/
+dist/
+outputs/
+work/
