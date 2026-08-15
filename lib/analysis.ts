@@ -1,3 +1,5 @@
+import type { ThreatIntelligenceResult } from "./threat-intelligence";
+
 export type RiskLevel = "low" | "medium" | "high" | "dangerous";
 
 export type EvidenceSeverity = "positive" | "warning" | "danger";
@@ -16,4 +18,5 @@ export interface AnalysisResult {
   evidence: AnalysisEvidence[];
   recommendations: string[];
   disclaimer: string;
+  threatIntelligence?: ThreatIntelligenceResult;
 }

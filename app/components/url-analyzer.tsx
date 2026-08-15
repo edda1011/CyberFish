@@ -50,7 +50,7 @@ export default function UrlAnalyzer() {
         {error && <p className="form-error" id="url-error" role="alert">{error}</p>}
         <button type="submit" disabled={isLoading} aria-busy={isLoading}>{isLoading ? "Checking…" : "Check link"} {isLoading ? <span className="button-spinner" aria-hidden="true" /> : <ArrowIcon />}</button>
       </form>
-      <p className="preview-note" id="url-help"><LockIcon /> Checked locally · Nothing is uploaded or saved</p>
+      <p className="preview-note" id="url-help"><LockIcon /> Not stored by CyberFish · Sent to Google Safe Browsing for a reputation check</p>
 
       {result && (
         <section className={`live-result result-${result.level}`} aria-live="polite" aria-label="URL analysis result">
@@ -63,6 +63,7 @@ export default function UrlAnalyzer() {
           </ul>
           <div className="result-advice"><strong>What to do next</strong>{result.recommendations.map((item) => <p key={item}>{item}</p>)}</div>
           <small className="result-disclaimer">{result.disclaimer}</small>
+          {result.threatIntelligence?.status === "match" && result.threatIntelligence.advisoryUrl && <a className="intel-advisory" href={result.threatIntelligence.advisoryUrl} target="_blank" rel="noreferrer">Advisory provided by Google</a>}
         </section>
       )}
     </div>

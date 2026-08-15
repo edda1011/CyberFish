@@ -17,3 +17,4 @@ Open `http://localhost:3001` in your browser.
 - Part 2: Responsive landing page UI
 - Part 3A: Interactive local URL analysis rules
 - Part 3B: Server-side URL analysis API
+- Part 3C: Google Safe Browsing threat-intelligence adapter

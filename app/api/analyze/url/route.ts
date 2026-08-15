@@ -1,4 +1,6 @@
 import { analyzeUrlLocally } from "../../../../lib/analyze-url";
+import { mergeThreatIntelligence } from "../../../../lib/merge-threat-intelligence";
+import { threatIntelligence } from "../../../../lib/threat-intelligence";
 
 const MAX_BODY_BYTES = 4096;
 
@@ -39,7 +41,9 @@ export async function POST(request: Request) {
   }
 
   try {
-    const result = analyzeUrlLocally(body.url);
+    const localResult = analyzeUrlLocally(body.url);
+    const intelligence = await threatIntelligence.checkUrl(body.url);
+    const result = mergeThreatIntelligence(localResult, intelligence);
     return Response.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (caught) {
     const message = caught instanceof Error ? caught.message : "This URL could not be checked.";

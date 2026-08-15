@@ -40,7 +40,7 @@ The first experience is a responsive website used on desktop or mobile when some
 
 ## Evidence on Hand
 
-No testimonials, customer logos, certifications, partner claims, or production threat-intelligence integrations are available yet. Future interfaces must not fabricate them.
+Google Safe Browsing v5 is the first optional threat-intelligence provider and requires a server-side API key. No testimonials, customer logos, certifications, or partner claims are available. Future interfaces must not fabricate them.
 
 ## Product Principles
 
