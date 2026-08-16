@@ -43,12 +43,12 @@ export default function UrlAnalyzer() {
   }
 
   return (
-    <div className={`analyzer-card ${result ? "has-result" : ""}`} id="analyzer">
+    <div className={`url-analyzer ${result ? "has-result" : ""}`}>
       <form aria-label="URL analyzer" onSubmit={submit} noValidate>
         <label className="analyzer-title" htmlFor="url">Check a link in seconds</label>
         <div className={`url-field ${error ? "field-error" : ""}`}><LinkIcon /><input id="url" name="url" type="text" inputMode="url" autoCapitalize="none" autoCorrect="off" spellCheck="false" placeholder="Paste the suspicious URL here" value={value} onChange={(event) => setValue(event.target.value)} aria-describedby={error ? "url-error" : "url-help"} aria-invalid={Boolean(error)} disabled={isLoading} /></div>
         {error && <p className="form-error" id="url-error" role="alert">{error}</p>}
-        <button type="submit" disabled={isLoading} aria-busy={isLoading}>{isLoading ? "Checking…" : "Check link"} {isLoading ? <span className="button-spinner" aria-hidden="true" /> : <ArrowIcon />}</button>
+        <button className="analyzer-submit" type="submit" disabled={isLoading} aria-busy={isLoading}>{isLoading ? "Checking…" : "Check link"} {isLoading ? <span className="button-spinner" aria-hidden="true" /> : <ArrowIcon />}</button>
       </form>
       <p className="preview-note" id="url-help"><LockIcon /> Not stored by CyberFish · Sent to Google Safe Browsing for a reputation check</p>
 

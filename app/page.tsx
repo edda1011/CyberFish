@@ -1,4 +1,4 @@
-import UrlAnalyzer from "./components/url-analyzer";
+import AnalyzerSwitcher from "./components/analyzer-switcher";
 
 const LockIcon = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v2" /></svg>
@@ -36,7 +36,7 @@ export default function Home() {
             <div className="hero-privacy"><span><LockIcon /></span><div><strong>Private by default</strong><small>Nothing you check is saved.</small></div></div>
           </div>
 
-          <UrlAnalyzer />
+          <AnalyzerSwitcher />
         </div>
       </section>
 
@@ -77,7 +77,7 @@ export default function Home() {
       <footer>
         <a className="brand footer-brand" href="#top"><BrandMark /><span>CyberFish</span></a>
         <p>Clear evidence. Safer next steps.</p>
-        <div className="footer-links"><a href="#how-it-works">How it works</a><a href="#privacy">Privacy</a><span>Part 3C · Threat intelligence</span></div>
+        <div className="footer-links"><a href="#how-it-works">How it works</a><a href="#privacy">Privacy</a><span>Part 4A · Email analyzer UI</span></div>
       </footer>
     </main>
   );

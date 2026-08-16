@@ -25,7 +25,8 @@ The first experience is a responsive website used on desktop or mobile when some
 ## Capabilities and Constraints
 
 - The MVP will analyze URLs and plain-text email content.
-- The current Part 2 surface is a visual foundation; real URL analysis is planned for Part 3.
+- URL analysis combines local rules with optional Google Safe Browsing reputation checks.
+- Part 4A adds an email-text input interface; email detection begins in Part 4B.
 - The service must not automatically open arbitrary user-provided websites or access private network addresses.
 - Submitted URLs, email content, and results are not stored by default.
 - The product must explain uncertainty and external-service failure instead of treating unknown results as safe.
