@@ -8,6 +8,7 @@ export interface AnalysisEvidence {
   title: string;
   description: string;
   severity: EvidenceSeverity;
+  source?: "local" | "ai";
 }
 
 export interface BaseAnalysisResult {
@@ -26,4 +27,9 @@ export interface AnalysisResult extends BaseAnalysisResult {
 
 export interface EmailAnalysisResult extends BaseAnalysisResult {
   detectedLinks: string[];
+  aiAnalysis?: {
+    status: "not_requested" | "completed" | "unavailable";
+    provider: "gemini";
+    message: string;
+  };
 }
