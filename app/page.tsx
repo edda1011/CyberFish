@@ -77,7 +77,7 @@ export default function Home() {
       <footer>
         <a className="brand footer-brand" href="#top"><BrandMark /><span>CyberFish</span></a>
         <p>Clear evidence. Safer next steps.</p>
-        <div className="footer-links"><a href="#how-it-works">How it works</a><a href="#privacy">Privacy</a><span>Part 4B · Local email analysis</span></div>
+        <div className="footer-links"><a href="#how-it-works">How it works</a><a href="#privacy">Privacy</a><span>Part 4C · Email analysis API</span></div>
       </footer>
     </main>
   );

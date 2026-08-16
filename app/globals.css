@@ -57,6 +57,7 @@ h1 span { display: block; margin-top: 6px; color: var(--aqua); font-weight: 520;
 .analyzer-tabs button[aria-selected="true"] { border-color: rgba(93,229,223,.28); background: rgba(93,229,223,.13); color: var(--aqua); }
 .analyzer-title { display: block; margin: 0 0 16px; font-size: 19px; font-weight: 750; }
 .analyzer-intro { margin: -8px 0 14px; color: #a7bbc9; font-size: 13px; }
+.email-upload-note { margin: -7px 0 14px; color: var(--aqua); font-size: 11px; font-weight: 700; }
 .url-field { height: 62px; display: flex; align-items: center; gap: 13px; padding: 0 18px; border-radius: 12px; background: var(--white); color: #607184; }
 .url-field svg { flex: 0 0 auto; color: #718399; }
 .url-field input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ink); opacity: 1; }

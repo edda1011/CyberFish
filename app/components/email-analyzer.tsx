@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { analyzeEmailLocally } from "../../lib/analyze-email";
 import type { EmailAnalysisResult } from "../../lib/analysis";
 import AnalysisResultView from "./analysis-result";
 
@@ -13,16 +12,40 @@ export default function EmailAnalyzer() {
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
   const [result, setResult] = useState<EmailAnalysisResult | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     setResult(null);
+    setIsLoading(true);
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
 
     try {
-      setResult(analyzeEmailLocally(value));
+      const response = await fetch("/api/analyze/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: value }),
+        cache: "no-store",
+        signal: controller.signal,
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error?.message ?? "The email could not be analyzed. Try again.");
+      }
+
+      setResult(data as EmailAnalysisResult);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "The email could not be analyzed. Try again.");
+      const message = caught instanceof Error && caught.name === "AbortError"
+        ? "The analysis took too long. Try again."
+        : caught instanceof Error ? caught.message : "The email could not be analyzed. Try again.";
+      setError(message);
+    } finally {
+      clearTimeout(timeout);
+      setIsLoading(false);
     }
   }
 
@@ -30,7 +53,8 @@ export default function EmailAnalyzer() {
     <div className="email-analyzer">
       <form aria-label="Email analyzer" onSubmit={submit} noValidate>
         <label className="analyzer-title" htmlFor="email-content">Paste the full email</label>
-        <p className="analyzer-intro">Include the sender, subject, message, and any links you can see.</p>
+        <p className="analyzer-intro">Copy the sender, subject, message, and any visible links from your email app, then paste them below.</p>
+        <p className="email-upload-note">File upload is planned for a future version.</p>
         <div className={`email-field ${error ? "field-error" : ""}`}>
           <MailIcon />
           <textarea
@@ -45,12 +69,13 @@ export default function EmailAnalyzer() {
             }}
             aria-describedby={error ? "email-error" : "email-help"}
             aria-invalid={Boolean(error)}
+            disabled={isLoading}
           />
         </div>
         {error && <p className="form-error" id="email-error" role="alert">{error}</p>}
-        <button className="analyzer-submit" type="submit">Analyze email <ArrowIcon /></button>
+        <button className="analyzer-submit" type="submit" disabled={isLoading} aria-busy={isLoading}>{isLoading ? "Analyzing…" : "Analyze email"} {isLoading ? <span className="button-spinner" aria-hidden="true" /> : <ArrowIcon />}</button>
       </form>
-      <p className="preview-note" id="email-help"><LockIcon /> Analyzed in your browser · Not stored or sent anywhere</p>
+      <p className="preview-note" id="email-help"><LockIcon /> Sent to CyberFish for analysis · Not stored or shared with third parties</p>
       {result && <AnalysisResultView result={result} label={`${result.detectedLinks.length} link${result.detectedLinks.length === 1 ? "" : "s"} found`} ariaLabel="Email analysis result" />}
     </div>
   );
