@@ -19,3 +19,4 @@ Open `http://localhost:3001` in your browser.
 - Part 3B: Server-side URL analysis API
 - Part 3C: Google Safe Browsing threat-intelligence adapter
 - Part 4A: Email analyzer input UI
+- Part 4B: Local English email analysis rules

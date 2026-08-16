@@ -10,13 +10,20 @@ export interface AnalysisEvidence {
   severity: EvidenceSeverity;
 }
 
-export interface AnalysisResult {
+export interface BaseAnalysisResult {
   score: number;
   level: RiskLevel;
   summary: string;
-  hostname: string;
   evidence: AnalysisEvidence[];
   recommendations: string[];
   disclaimer: string;
+}
+
+export interface AnalysisResult extends BaseAnalysisResult {
+  hostname: string;
   threatIntelligence?: ThreatIntelligenceResult;
+}
+
+export interface EmailAnalysisResult extends BaseAnalysisResult {
+  detectedLinks: string[];
 }
