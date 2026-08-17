@@ -57,7 +57,7 @@ Google Safe Browsing v5 is the first optional threat-intelligence provider and r
 
 The responsive interface should use plain language, visible keyboard focus, sufficient contrast, reduced-motion support, and touch targets suitable for mobile use.
 
-## Part 4D: Optional Gemini Email Analysis
+## Optional Gemini Email Analysis
 
 ### Scope and user consent
 
