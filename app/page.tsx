@@ -69,7 +69,7 @@ export default function Home() {
               <article><span className="moment-icon bank" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 9 9-5 9 5M5 10h14M6 10v7m4-7v7m4-7v7m4-7v7M4 18h16M3 21h18" /></svg></span><div><h3>Bank email</h3><p>Verify payment and account links through an official channel.</p></div></article>
               <article><span className="moment-icon account" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4" /></svg></span><div><h3>Account alert</h3><p>Double-check urgent sign-in or security notifications.</p></div></article>
             </div>
-            <div className="privacy-banner" id="privacy"><span><LockIcon /></span><div><strong>Your privacy comes first</strong><p>CyberFish does not store submitted URLs. Reputation checks send the URL to Google Safe Browsing.</p></div></div>
+            <div className="privacy-banner" id="privacy"><span><LockIcon /></span><div><strong>Your privacy comes first</strong><p>CyberFish does not store submitted content. URL reputation checks use Google Safe Browsing; email text is sent to Gemini only when you turn on AI analysis.</p></div></div>
           </div>
         </div>
       </section>
@@ -77,7 +77,7 @@ export default function Home() {
       <footer>
         <a className="brand footer-brand" href="#top"><BrandMark /><span>CyberFish</span></a>
         <p>Clear evidence. Safer next steps.</p>
-        <div className="footer-links"><a href="#how-it-works">How it works</a><a href="#privacy">Privacy</a><span>Part 4C · Email analysis API</span></div>
+        <div className="footer-links"><a href="#how-it-works">How it works</a><a href="#privacy">Privacy</a><span>Part 4D · Optional AI analysis</span></div>
       </footer>
     </main>
   );

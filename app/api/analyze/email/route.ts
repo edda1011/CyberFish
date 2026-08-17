@@ -1,8 +1,17 @@
 import { analyzeEmailLocally } from "../../../../lib/analyze-email";
+import { mergeEmailAiResult } from "../../../../lib/email-ai";
+import { analyzeEmailWithGemini, type GeminiUnavailableReason } from "../../../../lib/gemini-email";
 
 const MAX_BODY_BYTES = 64 * 1024;
 
 type ErrorCode = "INVALID_CONTENT_TYPE" | "REQUEST_TOO_LARGE" | "INVALID_JSON" | "INVALID_INPUT";
+
+const AI_UNAVAILABLE_MESSAGES: Record<GeminiUnavailableReason, string> = {
+  not_configured: "AI analysis is not configured. The local analysis is still complete.",
+  timeout: "AI analysis took too long. The local analysis is still complete.",
+  provider_error: "AI analysis is temporarily unavailable. The local analysis is still complete.",
+  invalid_response: "AI analysis returned an unusable response. The local analysis is still complete.",
+};
 
 function errorResponse(code: ErrorCode, message: string, status: number) {
   return Response.json(
@@ -44,9 +53,41 @@ export async function POST(request: Request) {
     return errorResponse("INVALID_INPUT", "Provide the email content as a text value.", 400);
   }
 
+  if ("useAi" in body && typeof body.useAi !== "boolean") {
+    return errorResponse("INVALID_INPUT", "The AI analysis choice must be true or false.", 400);
+  }
+
   try {
-    const result = analyzeEmailLocally(body.content);
-    return Response.json(result, { headers: { "Cache-Control": "no-store" } });
+    const localResult = analyzeEmailLocally(body.content);
+    const useAi = "useAi" in body && body.useAi === true;
+
+    if (!useAi) {
+      return Response.json({
+        ...localResult,
+        aiAnalysis: {
+          status: "not_requested",
+          provider: "gemini",
+          message: "AI analysis was not requested.",
+        },
+      }, { headers: { "Cache-Control": "no-store" } });
+    }
+
+    const aiResult = await analyzeEmailWithGemini(body.content);
+    if (aiResult.status === "completed") {
+      return Response.json(
+        mergeEmailAiResult(localResult, aiResult.result),
+        { headers: { "Cache-Control": "no-store" } },
+      );
+    }
+
+    return Response.json({
+      ...localResult,
+      aiAnalysis: {
+        status: "unavailable",
+        provider: "gemini",
+        message: AI_UNAVAILABLE_MESSAGES[aiResult.reason],
+      },
+    }, { headers: { "Cache-Control": "no-store" } });
   } catch (caught) {
     const message = caught instanceof Error ? caught.message : "This email could not be analyzed.";
     return errorResponse("INVALID_INPUT", message, 400);

@@ -101,8 +101,8 @@ export async function analyzeEmailWithGemini(
           parts: [{ text: `Analyze this JSON-encoded email data only:\n${JSON.stringify(content)}` }],
         }],
         generationConfig: {
-          temperature: 0,
-          maxOutputTokens: 500,
+          maxOutputTokens: 1_000,
+          thinkingConfig: { thinkingLevel: "MINIMAL" },
           responseMimeType: "application/json",
           responseJsonSchema: RESPONSE_SCHEMA,
         },
