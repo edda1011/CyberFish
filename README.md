@@ -22,3 +22,4 @@ Open `http://localhost:3001` in your browser.
 - Part 4B: Local English email analysis rules
 - Part 4C: Protected server-side email analysis API
 - Part 4D: Optional Gemini-assisted email analysis
+- Part 5A: In-memory API rate limiting

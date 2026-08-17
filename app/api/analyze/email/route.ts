@@ -1,10 +1,16 @@
 import { analyzeEmailLocally } from "../../../../lib/analyze-email";
 import { mergeEmailAiResult } from "../../../../lib/email-ai";
 import { analyzeEmailWithGemini, type GeminiUnavailableReason } from "../../../../lib/gemini-email";
+import {
+  AI_EMAIL_RATE_LIMIT,
+  ANALYSIS_RATE_LIMIT,
+  consumeRateLimit,
+  rateLimitHeaders,
+} from "../../../../lib/rate-limit";
 
 const MAX_BODY_BYTES = 64 * 1024;
 
-type ErrorCode = "INVALID_CONTENT_TYPE" | "REQUEST_TOO_LARGE" | "INVALID_JSON" | "INVALID_INPUT";
+type ErrorCode = "INVALID_CONTENT_TYPE" | "REQUEST_TOO_LARGE" | "INVALID_JSON" | "INVALID_INPUT" | "RATE_LIMITED";
 
 const AI_UNAVAILABLE_MESSAGES: Record<GeminiUnavailableReason, string> = {
   not_configured: "AI analysis is not configured. The local analysis is still complete.",
@@ -13,14 +19,30 @@ const AI_UNAVAILABLE_MESSAGES: Record<GeminiUnavailableReason, string> = {
   invalid_response: "AI analysis returned an unusable response. The local analysis is still complete.",
 };
 
-function errorResponse(code: ErrorCode, message: string, status: number) {
+function errorResponse(code: ErrorCode, message: string, status: number, headers?: Record<string, string>) {
   return Response.json(
     { error: { code, message } },
-    { status, headers: { "Cache-Control": "no-store" } },
+    { status, headers: { "Cache-Control": "no-store", ...headers } },
   );
 }
 
 export async function POST(request: Request) {
+  const rateLimit = consumeRateLimit(request, ANALYSIS_RATE_LIMIT);
+  if (!rateLimit.allowed) {
+    const minutes = Math.max(1, Math.ceil(rateLimit.retryAfterSeconds / 60));
+    return errorResponse(
+      "RATE_LIMITED",
+      `Too many analyses. Try again in about ${minutes} minute${minutes === 1 ? "" : "s"}.`,
+      429,
+      rateLimitHeaders(rateLimit),
+    );
+  }
+
+  const responseHeaders = {
+    "Cache-Control": "no-store",
+    ...rateLimitHeaders(rateLimit),
+  };
+
   const contentType = request.headers.get("content-type") ?? "";
   if (!contentType.toLowerCase().includes("application/json")) {
     return errorResponse("INVALID_CONTENT_TYPE", "Send the request as application/json.", 415);
@@ -69,14 +91,30 @@ export async function POST(request: Request) {
           provider: "gemini",
           message: "AI analysis was not requested.",
         },
-      }, { headers: { "Cache-Control": "no-store" } });
+      }, { headers: responseHeaders });
     }
+
+    const aiRateLimit = consumeRateLimit(request, AI_EMAIL_RATE_LIMIT);
+    if (!aiRateLimit.allowed) {
+      const minutes = Math.max(1, Math.ceil(aiRateLimit.retryAfterSeconds / 60));
+      return errorResponse(
+        "RATE_LIMITED",
+        `Too many AI-assisted analyses. Try again in about ${minutes} minute${minutes === 1 ? "" : "s"}, or turn off AI analysis.`,
+        429,
+        rateLimitHeaders(aiRateLimit, "AI-RateLimit"),
+      );
+    }
+
+    const aiResponseHeaders = {
+      ...responseHeaders,
+      ...rateLimitHeaders(aiRateLimit, "AI-RateLimit"),
+    };
 
     const aiResult = await analyzeEmailWithGemini(body.content);
     if (aiResult.status === "completed") {
       return Response.json(
         mergeEmailAiResult(localResult, aiResult.result),
-        { headers: { "Cache-Control": "no-store" } },
+        { headers: aiResponseHeaders },
       );
     }
 
@@ -87,7 +125,7 @@ export async function POST(request: Request) {
         provider: "gemini",
         message: AI_UNAVAILABLE_MESSAGES[aiResult.reason],
       },
-    }, { headers: { "Cache-Control": "no-store" } });
+    }, { headers: aiResponseHeaders });
   } catch (caught) {
     const message = caught instanceof Error ? caught.message : "This email could not be analyzed.";
     return errorResponse("INVALID_INPUT", message, 400);
