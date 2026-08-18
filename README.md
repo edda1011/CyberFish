@@ -33,3 +33,4 @@ Use `npm run test:watch` while developing to rerun tests when files change.
 - Part 5A: In-memory API rate limiting
 - Part 5B: Privacy-safe structured security logs
 - Part 5C1: Vitest foundation and local analysis tests
+- Part 5C2: Offline Gemini and AI result-merging tests
