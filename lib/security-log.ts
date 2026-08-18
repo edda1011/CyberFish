@@ -17,6 +17,7 @@ type AiStatus =
 
 type ThreatIntelligenceStatus = "match" | "no_match" | "unavailable";
 type DomainRegistrationStatus = "found" | "unavailable" | "not_applicable";
+type DnsSafetyStatus = "public" | "non_public" | "not_found" | "unavailable" | "not_applicable";
 
 type SecurityErrorCode =
   | "INVALID_CONTENT_TYPE"
@@ -35,6 +36,7 @@ export type SecurityEventDetails = {
   aiStatus?: AiStatus;
   threatIntelligenceStatus?: ThreatIntelligenceStatus;
   domainRegistrationStatus?: DomainRegistrationStatus;
+  dnsSafetyStatus?: DnsSafetyStatus;
 };
 
 export function createSecurityLogger(endpoint: SecurityEndpoint) {

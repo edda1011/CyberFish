@@ -1,5 +1,6 @@
 import type { ThreatIntelligenceResult } from "./threat-intelligence";
 import type { DomainRegistrationResult } from "./domain-registration";
+import type { DnsSafetyResult } from "./dns-safety";
 
 export type RiskLevel = "low" | "medium" | "high" | "dangerous";
 
@@ -25,6 +26,7 @@ export interface AnalysisResult extends BaseAnalysisResult {
   hostname: string;
   threatIntelligence?: ThreatIntelligenceResult;
   domainRegistration?: DomainRegistrationResult;
+  dnsSafety?: DnsSafetyResult;
 }
 
 export interface EmailAnalysisResult extends BaseAnalysisResult {

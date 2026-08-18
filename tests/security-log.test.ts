@@ -64,10 +64,12 @@ describe("privacy-safe security logs", () => {
       status: 200,
       threatIntelligenceStatus: "unavailable",
       domainRegistrationStatus: "found",
+      dnsSafetyStatus: "public",
     });
 
     const { line, event } = parseLoggedEvent(vi.mocked(console.info));
     expect(Object.keys(event).sort()).toEqual([
+      "dnsSafetyStatus",
       "domainRegistrationStatus",
       "durationMs",
       "endpoint",

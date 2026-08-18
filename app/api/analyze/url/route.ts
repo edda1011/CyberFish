@@ -1,6 +1,8 @@
 import { analyzeUrlLocally } from "../../../../lib/analyze-url";
 import { domainRegistration } from "../../../../lib/domain-registration";
+import { dnsSafety } from "../../../../lib/dns-safety";
 import { mergeDomainRegistration } from "../../../../lib/merge-domain-registration";
+import { mergeDnsSafety } from "../../../../lib/merge-dns-safety";
 import { mergeThreatIntelligence } from "../../../../lib/merge-threat-intelligence";
 import { ANALYSIS_RATE_LIMIT, consumeRateLimit, rateLimitHeaders } from "../../../../lib/rate-limit";
 import { createSecurityLogger } from "../../../../lib/security-log";
@@ -69,12 +71,13 @@ export async function POST(request: Request) {
 
   try {
     const localResult = analyzeUrlLocally(body.url);
-    const [intelligence, registration] = await Promise.all([
+    const [intelligence, registration, dns] = await Promise.all([
       threatIntelligence.checkUrl(body.url),
       domainRegistration.checkDomain(localResult.hostname),
+      dnsSafety.checkHostname(localResult.hostname),
     ]);
     const result = mergeThreatIntelligence(
-      mergeDomainRegistration(localResult, registration),
+      mergeDomainRegistration(mergeDnsSafety(localResult, dns), registration),
       intelligence,
     );
     logSecurityEvent({
@@ -82,6 +85,7 @@ export async function POST(request: Request) {
       status: 200,
       threatIntelligenceStatus: intelligence.status,
       domainRegistrationStatus: registration.status,
+      dnsSafetyStatus: dns.status,
     });
     return Response.json(result, { headers: responseHeaders });
   } catch (caught) {
