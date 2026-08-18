@@ -11,6 +11,14 @@ npm run dev
 
 Open `http://localhost:3001` in your browser.
 
+## Automated tests
+
+```bash
+npm test
+```
+
+Use `npm run test:watch` while developing to rerun tests when files change.
+
 ## Current progress
 
 - Part 1: Project foundation
@@ -24,3 +32,4 @@ Open `http://localhost:3001` in your browser.
 - Part 4D: Optional Gemini-assisted email analysis
 - Part 5A: In-memory API rate limiting
 - Part 5B: Privacy-safe structured security logs
+- Part 5C1: Vitest foundation and local analysis tests
