@@ -2,11 +2,16 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const providerMocks = vi.hoisted(() => ({
   checkUrl: vi.fn(),
+  checkDomain: vi.fn(),
   analyzeEmail: vi.fn(),
 }));
 
 vi.mock("../lib/threat-intelligence", () => ({
   threatIntelligence: { checkUrl: providerMocks.checkUrl },
+}));
+
+vi.mock("../lib/domain-registration", () => ({
+  domainRegistration: { checkDomain: providerMocks.checkDomain },
 }));
 
 vi.mock("../lib/gemini-email", () => ({
@@ -41,6 +46,14 @@ beforeEach(() => {
     status: "completed",
     result: { findings: [] },
   });
+  providerMocks.checkDomain.mockReset().mockResolvedValue({
+    provider: "rdap",
+    status: "found",
+    registeredDomain: "example.com",
+    registeredAt: "2020-01-01T00:00:00.000Z",
+    ageDays: 2_000,
+    message: "The registry reports an established registration date.",
+  });
   vi.spyOn(console, "info").mockImplementation(() => undefined);
   vi.spyOn(console, "warn").mockImplementation(() => undefined);
   vi.spyOn(console, "error").mockImplementation(() => undefined);
@@ -55,7 +68,9 @@ describe("URL analysis API", () => {
     expect(response.headers.get("Cache-Control")).toBe("no-store");
     expect(response.headers.get("RateLimit-Limit")).toBe("30");
     expect(result.threatIntelligence.status).toBe("no_match");
+    expect(result.domainRegistration.status).toBe("found");
     expect(providerMocks.checkUrl).toHaveBeenCalledWith("https://example.com");
+    expect(providerMocks.checkDomain).toHaveBeenCalledWith("example.com");
   });
 
   it("returns a usable local result when reputation intelligence is unavailable", async () => {
@@ -95,6 +110,7 @@ describe("URL analysis API", () => {
 
     expect(response.status).toBe(413);
     expect(providerMocks.checkUrl).not.toHaveBeenCalled();
+    expect(providerMocks.checkDomain).not.toHaveBeenCalled();
   });
 });
 

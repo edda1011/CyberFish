@@ -1,4 +1,6 @@
 import { analyzeUrlLocally } from "../../../../lib/analyze-url";
+import { domainRegistration } from "../../../../lib/domain-registration";
+import { mergeDomainRegistration } from "../../../../lib/merge-domain-registration";
 import { mergeThreatIntelligence } from "../../../../lib/merge-threat-intelligence";
 import { ANALYSIS_RATE_LIMIT, consumeRateLimit, rateLimitHeaders } from "../../../../lib/rate-limit";
 import { createSecurityLogger } from "../../../../lib/security-log";
@@ -67,12 +69,19 @@ export async function POST(request: Request) {
 
   try {
     const localResult = analyzeUrlLocally(body.url);
-    const intelligence = await threatIntelligence.checkUrl(body.url);
-    const result = mergeThreatIntelligence(localResult, intelligence);
+    const [intelligence, registration] = await Promise.all([
+      threatIntelligence.checkUrl(body.url),
+      domainRegistration.checkDomain(localResult.hostname),
+    ]);
+    const result = mergeThreatIntelligence(
+      mergeDomainRegistration(localResult, registration),
+      intelligence,
+    );
     logSecurityEvent({
       outcome: "completed",
       status: 200,
       threatIntelligenceStatus: intelligence.status,
+      domainRegistrationStatus: registration.status,
     });
     return Response.json(result, { headers: responseHeaders });
   } catch (caught) {
