@@ -1,4 +1,5 @@
 import type { AnalysisEvidence, AnalysisResult, RiskLevel } from "./analysis";
+import { parse } from "tldts";
 
 const SHORTENERS = new Set([
   "bit.ly", "tinyurl.com", "t.co", "goo.gl", "ow.ly", "is.gd", "buff.ly", "cutt.ly", "rebrand.ly",
@@ -9,6 +10,23 @@ const SUSPICIOUS_WORDS = [
 ];
 
 const IPV4_PATTERN = /^(?:\d{1,3}\.){3}\d{1,3}$/;
+
+function containsEmbeddedDomain(hostname: string) {
+  const parsedHostname = parse(hostname, { allowPrivateDomains: false });
+  if (!parsedHostname.domain || !parsedHostname.subdomain) return false;
+
+  const labels = parsedHostname.subdomain.split(".");
+  for (let start = 0; start < labels.length - 1; start += 1) {
+    for (let end = start + 1; end < labels.length; end += 1) {
+      const candidate = labels.slice(start, end + 1).join(".");
+      const parsedCandidate = parse(candidate, { allowPrivateDomains: false });
+      if (parsedCandidate.isIcann && parsedCandidate.domain === candidate && !parsedCandidate.subdomain) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
 
 function riskLevel(score: number): RiskLevel {
   if (score >= 70) return "dangerous";
@@ -79,6 +97,14 @@ export function analyzeUrlLocally(input: string): AnalysisResult {
   const labels = hostname.split(".");
   if (labels.length > 4) {
     add(14, { title: "Many subdomains", description: "A long chain of subdomains can make the real domain harder to notice.", severity: "warning" });
+  }
+
+  if (containsEmbeddedDomain(hostname)) {
+    add(25, {
+      title: "Domain-like text hidden in the subdomain",
+      description: "A familiar-looking domain appears before the real destination. Attackers can use this pattern to make a different website look legitimate.",
+      severity: "danger",
+    });
   }
 
   const matchedWords = SUSPICIOUS_WORDS.filter((word) => hostname.includes(word));

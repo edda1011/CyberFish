@@ -45,6 +45,33 @@ describe("local URL analysis", () => {
     expect(result.evidence.map((item) => item.title)).toContain("Many subdomains");
   });
 
+  it.each([
+    "https://paypal.com.fake-site.com/login",
+    "https://microsoft.com.login.example.net",
+    "https://bank.co.uk.secure-example.com",
+  ])("flags a complete domain hidden inside the subdomain of %s", (url) => {
+    const result = analyzeUrlLocally(url);
+
+    expect(result.score).toBeGreaterThanOrEqual(25);
+    expect(result.evidence.map((item) => item.title)).toContain("Domain-like text hidden in the subdomain");
+  });
+
+  it.each([
+    "https://support.example.com",
+    "https://accounts.google.com",
+    "https://help.example.co.uk",
+  ])("does not flag the normal service subdomain in %s", (url) => {
+    const result = analyzeUrlLocally(url);
+
+    expect(result.evidence.map((item) => item.title).includes("Domain-like text hidden in the subdomain")).toBe(false);
+  });
+
+  it("keeps the combined score within 100", () => {
+    const result = analyzeUrlLocally(`http://user:password@paypal.com.login.secure-account-example.com:8080/${"a".repeat(150)}`);
+
+    expect(result.score).toBe(100);
+  });
+
   it("rejects empty, unsupported, and oversized input", () => {
     expect(() => analyzeUrlLocally("   ")).toThrow("Enter a URL");
     expect(() => analyzeUrlLocally("ftp://example.com")).toThrow("Only HTTP and HTTPS");

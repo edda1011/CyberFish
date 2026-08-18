@@ -37,3 +37,4 @@ Use `npm run test:watch` while developing to rerun tests when files change.
 - Part 5C3: API protection, rate-limit, and privacy-log tests
 - Part 6A: RDAP domain registration age checks
 - Part 6B: DNS and non-public network safety checks
+- Part 6C: Embedded-domain impersonation detection
