@@ -7,12 +7,19 @@ import AnalysisResultView from "./analysis-result";
 const LinkIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.2 13.8a4.5 4.5 0 0 0 6.36.06l2.3-2.3a4.5 4.5 0 0 0-6.36-6.36l-1.32 1.32M13.8 10.2a4.5 4.5 0 0 0-6.36-.06l-2.3 2.3a4.5 4.5 0 0 0 6.36 6.36l1.31-1.31" /></svg>;
 const LockIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v2" /></svg>;
 const ArrowIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M14 7l5 5-5 5" /></svg>;
+const ClearIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17" /></svg>;
 
 export default function UrlAnalyzer() {
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  function clearUrl() {
+    setValue("");
+    setError("");
+    setResult(null);
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -44,7 +51,29 @@ export default function UrlAnalyzer() {
     <div className={`url-analyzer ${result ? "has-result" : ""}`}>
       <form aria-label="URL analyzer" onSubmit={submit} noValidate>
         <label className="analyzer-title" htmlFor="url">Check a link in seconds</label>
-        <div className={`url-field ${error ? "field-error" : ""}`}><LinkIcon /><input id="url" name="url" type="text" inputMode="url" autoCapitalize="none" autoCorrect="off" spellCheck="false" placeholder="Paste the suspicious URL here" value={value} onChange={(event) => setValue(event.target.value)} aria-describedby={error ? "url-error" : "url-help"} aria-invalid={Boolean(error)} disabled={isLoading} /></div>
+        <div className={`url-field ${error ? "field-error" : ""}`}>
+          <LinkIcon />
+          <input
+            id="url"
+            name="url"
+            type="text"
+            inputMode="url"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck="false"
+            placeholder="Paste the suspicious URL here"
+            value={value}
+            onChange={(event) => {
+              setValue(event.target.value);
+              if (error) setError("");
+              if (result) setResult(null);
+            }}
+            aria-describedby={error ? "url-error" : "url-help"}
+            aria-invalid={Boolean(error)}
+            disabled={isLoading}
+          />
+          {value && <button className="url-clear" type="button" onClick={clearUrl} aria-label="Clear URL" disabled={isLoading}><ClearIcon /></button>}
+        </div>
         {error && <p className="form-error" id="url-error" role="alert">{error}</p>}
         <button className="analyzer-submit" type="submit" disabled={isLoading} aria-busy={isLoading}>{isLoading ? "Checking…" : "Check link"} {isLoading ? <span className="button-spinner" aria-hidden="true" /> : <ArrowIcon />}</button>
       </form>

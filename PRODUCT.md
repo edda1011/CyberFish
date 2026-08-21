@@ -28,7 +28,7 @@ The first experience is a responsive website used on desktop or mobile when some
 - URL analysis combines local rules with optional Google Safe Browsing reputation checks.
 - Email text can be checked locally for common English scam patterns and suspicious link structure.
 - Email analysis runs through a no-store server endpoint. Local analysis is the default; email content is sent to Google Gemini only after the user explicitly enables AI analysis.
-- The email form can import a small `.eml` file locally as text. Full MIME, HTML, encoded-body, and header analysis is deferred; attachment scanning remains outside the current version.
+- The email form can parse a small `.eml` file locally, extract readable headers and text, and safely convert HTML-only bodies to plain text. Attachment names are shown but attachment scanning remains outside the current version. Header-based risk scoring is deferred.
 - The service must not automatically open arbitrary user-provided websites or access private network addresses.
 - Submitted URLs, email content, and results are not stored by default.
 - The product must explain uncertainty and external-service failure instead of treating unknown results as safe.

@@ -3,6 +3,7 @@
 import { ChangeEvent, FormEvent, useRef, useState } from "react";
 import type { EmailAnalysisResult } from "../../lib/analysis";
 import { formatEmlFileSize, readEmlFile } from "../../lib/eml-file";
+import type { ParsedEmlContent } from "../../lib/eml-file";
 import AnalysisResultView from "./analysis-result";
 
 const MailIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m4 7 8 6 8-6" /></svg>;
@@ -17,7 +18,7 @@ export default function EmailAnalyzer() {
   const [result, setResult] = useState<EmailAnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [useAi, setUseAi] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<{ name: string; size: number } | null>(null);
+  const [selectedFile, setSelectedFile] = useState<({ name: string; size: number } & ParsedEmlContent) | null>(null);
   const [isReadingFile, setIsReadingFile] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -30,9 +31,9 @@ export default function EmailAnalyzer() {
     setIsReadingFile(true);
 
     try {
-      const content = await readEmlFile(file);
-      setValue(content);
-      setSelectedFile({ name: file.name, size: file.size });
+      const parsed = await readEmlFile(file);
+      setValue(parsed.content);
+      setSelectedFile({ name: file.name, size: file.size, ...parsed });
     } catch (caught) {
       setSelectedFile(null);
       setError(caught instanceof Error ? caught.message : "CyberFish could not read this file. Try choosing it again.");
@@ -44,6 +45,9 @@ export default function EmailAnalyzer() {
 
   function removeSelectedFile() {
     setSelectedFile(null);
+    setValue("");
+    setError("");
+    setResult(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
@@ -105,8 +109,25 @@ export default function EmailAnalyzer() {
         {selectedFile && (
           <div className="email-file-chip" aria-live="polite">
             <FileIcon />
-            <span><strong>{selectedFile.name}</strong><small>{formatEmlFileSize(selectedFile.size)} · Ready to review</small></span>
+            <span><strong>{selectedFile.name}</strong><small>{formatEmlFileSize(selectedFile.size)} · {selectedFile.bodySource === "html" ? "HTML converted to plain text" : "Plain text extracted"}</small></span>
             <button type="button" onClick={removeSelectedFile} disabled={isLoading}>Remove</button>
+          </div>
+        )}
+        {selectedFile && (
+          <div className="email-parse-summary" aria-label="Imported email details">
+            <dl>
+              {selectedFile.metadata.from && <div><dt>From</dt><dd>{selectedFile.metadata.from}</dd></div>}
+              {selectedFile.metadata.replyTo && <div><dt>Reply-To</dt><dd>{selectedFile.metadata.replyTo}</dd></div>}
+              {selectedFile.metadata.to && <div><dt>To</dt><dd>{selectedFile.metadata.to}</dd></div>}
+              {selectedFile.metadata.subject && <div><dt>Subject</dt><dd>{selectedFile.metadata.subject}</dd></div>}
+              {selectedFile.metadata.date && <div><dt>Date</dt><dd>{selectedFile.metadata.date}</dd></div>}
+            </dl>
+            {selectedFile.attachments.length > 0 && (
+              <div className="email-attachment-notice" role="note">
+                <strong>{selectedFile.attachments.length} attachment{selectedFile.attachments.length === 1 ? "" : "s"} detected · Not scanned</strong>
+                <span>{selectedFile.attachments.slice(0, 5).map((attachment) => attachment.filename).join(", ")}{selectedFile.attachments.length > 5 ? `, and ${selectedFile.attachments.length - 5} more` : ""}</span>
+              </div>
+            )}
           </div>
         )}
         <div className={`email-field ${error ? "field-error" : ""}`}>
