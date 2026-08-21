@@ -1,12 +1,15 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useRef, useState } from "react";
 import type { EmailAnalysisResult } from "../../lib/analysis";
+import { formatEmlFileSize, readEmlFile } from "../../lib/eml-file";
 import AnalysisResultView from "./analysis-result";
 
 const MailIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m4 7 8 6 8-6" /></svg>;
 const LockIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v2" /></svg>;
 const ArrowIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M14 7l5 5-5 5" /></svg>;
+const UploadIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5" /></svg>;
+const FileIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6zM14 3v5h4M9 13h6M9 17h4" /></svg>;
 
 export default function EmailAnalyzer() {
   const [value, setValue] = useState("");
@@ -14,6 +17,35 @@ export default function EmailAnalyzer() {
   const [result, setResult] = useState<EmailAnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [useAi, setUseAi] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<{ name: string; size: number } | null>(null);
+  const [isReadingFile, setIsReadingFile] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  async function importEmlFile(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setError("");
+    setResult(null);
+    setIsReadingFile(true);
+
+    try {
+      const content = await readEmlFile(file);
+      setValue(content);
+      setSelectedFile({ name: file.name, size: file.size });
+    } catch (caught) {
+      setSelectedFile(null);
+      setError(caught instanceof Error ? caught.message : "CyberFish could not read this file. Try choosing it again.");
+    } finally {
+      setIsReadingFile(false);
+      event.target.value = "";
+    }
+  }
+
+  function removeSelectedFile() {
+    setSelectedFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -53,9 +85,30 @@ export default function EmailAnalyzer() {
   return (
     <div className="email-analyzer">
       <form aria-label="Email analyzer" onSubmit={submit} noValidate>
-        <label className="analyzer-title" htmlFor="email-content">Paste the full email</label>
-        <p className="analyzer-intro">Copy the sender, subject, message, and any visible links from your email app, then paste them below.</p>
-        <p className="email-upload-note">File upload is planned for a future version.</p>
+        <label className="analyzer-title" htmlFor="email-content">Paste or import an email</label>
+        <p className="analyzer-intro">Paste the sender, subject, message, and visible links—or import a small .eml file.</p>
+        <div className="email-import">
+          <input
+            ref={fileInputRef}
+            className="visually-hidden"
+            id="email-file"
+            type="file"
+            accept=".eml,message/rfc822"
+            onChange={importEmlFile}
+            disabled={isLoading || isReadingFile}
+          />
+          <label className="email-import-button" htmlFor="email-file" aria-disabled={isLoading || isReadingFile}>
+            <UploadIcon /> {isReadingFile ? "Reading file…" : "Choose .eml file"}
+          </label>
+          <span className="email-import-help">Read on this device · 50 KB max</span>
+        </div>
+        {selectedFile && (
+          <div className="email-file-chip" aria-live="polite">
+            <FileIcon />
+            <span><strong>{selectedFile.name}</strong><small>{formatEmlFileSize(selectedFile.size)} · Ready to review</small></span>
+            <button type="button" onClick={removeSelectedFile} disabled={isLoading}>Remove</button>
+          </div>
+        )}
         <div className={`email-field ${error ? "field-error" : ""}`}>
           <MailIcon />
           <textarea
@@ -70,7 +123,7 @@ export default function EmailAnalyzer() {
             }}
             aria-describedby={error ? "email-error" : "email-help"}
             aria-invalid={Boolean(error)}
-            disabled={isLoading}
+            disabled={isLoading || isReadingFile}
           />
         </div>
         <div className={`ai-option ${useAi ? "ai-option-active" : ""}`}>
@@ -94,9 +147,9 @@ export default function EmailAnalyzer() {
             : "Keep this off to analyze the email locally without sending it to an AI provider."}</p>
         </div>
         {error && <p className="form-error" id="email-error" role="alert">{error}</p>}
-        <button className="analyzer-submit" type="submit" disabled={isLoading} aria-busy={isLoading}>{isLoading ? (useAi ? "Analyzing with AI…" : "Analyzing locally…") : "Analyze email"} {isLoading ? <span className="button-spinner" aria-hidden="true" /> : <ArrowIcon />}</button>
+        <button className="analyzer-submit" type="submit" disabled={isLoading || isReadingFile} aria-busy={isLoading || isReadingFile}>{isLoading ? (useAi ? "Analyzing with AI…" : "Analyzing locally…") : "Analyze email"} {isLoading ? <span className="button-spinner" aria-hidden="true" /> : <ArrowIcon />}</button>
       </form>
-      <p className="preview-note" id="email-help"><LockIcon /> {useAi ? "AI-assisted analysis · Not stored by CyberFish" : "Local analysis · Not stored or shared"}</p>
+      <p className="preview-note" id="email-help"><LockIcon /> {useAi ? "AI-assisted analysis · Not stored by CyberFish" : "Imported files stay on this device until you choose Analyze"}</p>
       {result && <AnalysisResultView
         result={result}
         label={`${result.detectedLinks.length} link${result.detectedLinks.length === 1 ? "" : "s"} found`}

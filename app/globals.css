@@ -57,7 +57,22 @@ h1 span { display: block; margin-top: 6px; color: var(--aqua); font-weight: 520;
 .analyzer-tabs button[aria-selected="true"] { border-color: rgba(93,229,223,.28); background: rgba(93,229,223,.13); color: var(--aqua); }
 .analyzer-title { display: block; margin: 0 0 16px; font-size: 19px; font-weight: 750; }
 .analyzer-intro { margin: -8px 0 14px; color: #a7bbc9; font-size: 13px; }
-.email-upload-note { margin: -7px 0 14px; color: var(--aqua); font-size: 11px; font-weight: 700; }
+.visually-hidden { width: 1px; height: 1px; padding: 0; position: absolute; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.email-import { margin: -3px 0 14px; display: flex; align-items: center; gap: 11px; flex-wrap: wrap; }
+.email-import-button { min-height: 40px; padding: 8px 13px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid rgba(93,229,223,.38); border-radius: 10px; background: rgba(93,229,223,.09); color: #b9f5f1; font-size: 12px; font-weight: 780; cursor: pointer; transition: background .2s ease, border-color .2s ease, color .2s ease; }
+.email-import-button:hover { border-color: rgba(93,229,223,.68); background: rgba(93,229,223,.15); color: #e4fffd; }
+.email-import-button[aria-disabled="true"] { cursor: wait; opacity: .6; }
+.email-import-button svg,.email-file-chip>svg { width: 17px; flex: 0 0 auto; }
+.email-import-help { color: #a7bbc9; font-size: 11px; }
+.email-file-chip { min-width: 0; margin: -3px 0 14px; padding: 10px 12px; display: grid; grid-template-columns: 20px minmax(0,1fr) auto; align-items: center; gap: 10px; border-radius: 11px; background: rgba(255,255,255,.065); color: var(--aqua); }
+.email-file-chip span { min-width: 0; }
+.email-file-chip strong,.email-file-chip small { display: block; overflow-wrap: anywhere; }
+.email-file-chip strong { color: #eefafa; font-size: 12px; }
+.email-file-chip small { margin-top: 2px; color: #a7bbc9; font-size: 10px; }
+.email-file-chip button { min-height: 36px; padding: 6px 9px; border: 0; border-radius: 8px; background: transparent; color: #b9d0dc; font-size: 11px; font-weight: 700; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.email-file-chip button:hover { color: white; background: rgba(255,255,255,.07); }
+.email-file-chip button:disabled { cursor: wait; opacity: .6; }
+#email-file:focus-visible + .email-import-button { outline: 3px solid var(--aqua); outline-offset: 3px; }
 .url-field { height: 62px; display: flex; align-items: center; gap: 13px; padding: 0 18px; border-radius: 12px; background: var(--white); color: #607184; }
 .url-field svg { flex: 0 0 auto; color: #718399; }
 .url-field input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ink); opacity: 1; }
@@ -157,6 +172,7 @@ footer>p { color: var(--muted); font-size: 13px; }.footer-links { display: flex;
   .privacy-chip { width: 44px; padding: 0; justify-content: center; font-size: 0; }.privacy-chip svg { width: 17px; }
   .hero { width: calc(100% - 32px); padding-top: 42px; }.hero h1 { font-size: clamp(38px, 11.5vw, 48px); line-height: 1.08; }.hero-copy>p { margin-top: 22px; font-size: 16px; }.hero-privacy { margin-top: 24px; }
   .analyzer-card { padding: 20px; }.analyzer-tabs { margin: -10px -10px 20px; }.analyzer-tabs button { padding-left: 8px; padding-right: 8px; font-size: 12px; }.analyzer-title { font-size: 17px; }.url-field { height: 56px; padding: 0 14px; }.url-field input { min-width: 0; font-size: 16px; }.email-field { min-height: 160px; padding: 14px; }.email-field textarea { min-height: 132px; font-size: 16px; }.ai-option>p { margin-left: 0; }
+  .email-import { align-items: flex-start; flex-direction: column; gap: 7px; }.email-import-button { width: 100%; }.email-file-chip { grid-template-columns: 20px minmax(0,1fr); }.email-file-chip button { grid-column: 2; justify-self: start; margin-left: -9px; }
   .live-result-heading { grid-template-columns: 76px 1fr; }.live-result-heading>div:first-child { width: 72px; height: 72px; }.live-result-heading strong { font-size: 23px; }
   .guidance-shell { padding: 55px 16px 48px; }.warning-heading { padding: 17px; }.warning-heading small { display: none; }.result-columns { grid-template-columns: 1fr; padding: 22px 18px; }.next-step { padding: 20px 0 0; border-left: 0; border-top: 1px solid var(--line); }.disclaimer { padding: 12px 18px; }
   .section-heading { display: block; }.section-heading p { margin-top: 4px; }
