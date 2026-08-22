@@ -3,7 +3,8 @@ import type { Address, Mailbox } from "postal-mime";
 import type { EmailAuthenticationMethod, EmailAuthenticationStatus, EmailHeaderSignals } from "./email-header-analysis";
 import type { AttachmentMetadata } from "./attachment-analysis";
 
-export const MAX_EML_FILE_BYTES = 50_000;
+export const MAX_EML_FILE_BYTES = 15_000_000;
+export const MAX_EML_READABLE_TEXT_CHARACTERS = 50_000;
 
 export type ReadableEmlFile = Pick<File, "name" | "size" | "text">;
 
@@ -33,7 +34,7 @@ export function validateEmlFile(file: Pick<ReadableEmlFile, "name" | "size">) {
   }
 
   if (file.size > MAX_EML_FILE_BYTES) {
-    throw new Error("This .eml file is over 50 KB. Choose a smaller file.");
+    throw new Error("This .eml file is over 15 MB. Choose a smaller file.");
   }
 }
 
@@ -196,7 +197,7 @@ export async function parseEmlContent(rawEmail: string): Promise<ParsedEmlConten
     .filter((line): line is string => line !== null)
     .join("\n");
 
-  if (content.length > MAX_EML_FILE_BYTES) {
+  if (content.length > MAX_EML_READABLE_TEXT_CHARACTERS) {
     throw new Error("This .eml file contains too much readable text. Choose a smaller file.");
   }
 
@@ -206,6 +207,9 @@ export async function parseEmlContent(rawEmail: string): Promise<ParsedEmlConten
     attachments: parsed.attachments.slice(0, 50).map((attachment, index) => ({
       filename: cleanAttachmentName(attachment.filename, index),
       mimeType: cleanHeader(attachment.mimeType) ?? "unknown type",
+      size: typeof attachment.content === "string"
+        ? new TextEncoder().encode(attachment.content).byteLength
+        : attachment.content.byteLength,
     })),
     bodySource: plainBody ? "text" : "html",
     headerSignals,
@@ -227,14 +231,11 @@ export async function readEmlFile(file: ReadableEmlFile) {
     throw new Error("This .eml file is empty. Choose a file that contains an email.");
   }
 
-  if (rawEmail.length > MAX_EML_FILE_BYTES) {
-    throw new Error("This .eml file contains too much text. Choose a smaller file.");
-  }
-
   return parseEmlContent(rawEmail);
 }
 
 export function formatEmlFileSize(size: number) {
   if (size < 1_000) return `${size} B`;
-  return `${(size / 1_000).toFixed(size < 10_000 ? 1 : 0)} KB`;
+  if (size < 1_000_000) return `${(size / 1_000).toFixed(size < 10_000 ? 1 : 0)} KB`;
+  return `${(size / 1_000_000).toFixed(size < 10_000_000 ? 1 : 0)} MB`;
 }

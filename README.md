@@ -42,3 +42,4 @@ Use `npm run test:watch` while developing to rerun tests when files change.
 - Part 7B: Safe MIME parsing and readable `.eml` extraction
 - Part 7C: Conservative `.eml` header and authentication analysis
 - Part 7D: Attachment filename and MIME-type risk hints
+- Part 7E: Attachment size and quantity risk hints

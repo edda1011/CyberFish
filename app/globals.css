@@ -84,6 +84,7 @@ h1 span { display: block; margin-top: 6px; color: var(--aqua); font-weight: 520;
 .email-attachment-notice ul { list-style: none; margin: 5px 0 0; padding: 0; display: grid; gap: 5px; }
 .email-attachment-notice li { min-width: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 .email-attachment-notice li span { min-width: 0; color: #c7d5de; font-size: 9px; line-height: 1.4; overflow-wrap: anywhere; }
+.email-attachment-notice li span small { display: block; margin-top: 1px; color: #8fa9ba; font-size: 8px; font-weight: 650; }
 .email-attachment-notice li small { flex: 0 0 auto; color: #9ee6e2; font-size: 8px; font-weight: 800; line-height: 1.4; text-align: right; }
 .email-attachment-notice li small[data-tone="warning"] { color: #f2d99e; }
 .email-attachment-notice li small[data-tone="danger"] { color: #ffb3aa; }

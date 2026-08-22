@@ -78,7 +78,7 @@ describe(".eml file import", () => {
       "Content-Transfer-Encoding: base64", "", "REFOR0VST1VTX0FUVEFDSE1FTlQ=", "--mixed--",
     ].join("\r\n"));
 
-    expect(result.attachments).toEqual([{ filename: "invoice.exe", mimeType: "application/octet-stream" }]);
+    expect(result.attachments).toEqual([{ filename: "invoice.exe", mimeType: "application/octet-stream", size: 20 }]);
     expect(result.content).not.toContain("DANGEROUS_ATTACHMENT");
   });
 
@@ -95,8 +95,9 @@ describe(".eml file import", () => {
     expect(() => validateEmlFile(emlFile({ name: "message.txt" }))).toThrow("Choose an .eml");
   });
 
-  it("rejects files over 50 KB before reading them", async () => {
-    await expect(readEmlFile(emlFile({ size: 50_001 }))).rejects.toThrow("over 50 KB");
+  it("rejects files over 15 MB before reading them", async () => {
+    expect(() => validateEmlFile(emlFile({ size: 15_000_000 }))).not.toThrow();
+    await expect(readEmlFile(emlFile({ size: 15_000_001 }))).rejects.toThrow("over 15 MB");
   });
 
   it("rejects empty files and messages without a readable body", async () => {
@@ -112,5 +113,6 @@ describe(".eml file import", () => {
   it("formats file sizes for the selected-file summary", () => {
     expect(formatEmlFileSize(842)).toBe("842 B");
     expect(formatEmlFileSize(12_400)).toBe("12 KB");
+    expect(formatEmlFileSize(2_400_000)).toBe("2.4 MB");
   });
 });

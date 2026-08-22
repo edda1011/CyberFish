@@ -91,7 +91,7 @@ export default function EmailAnalyzer() {
     <div className="email-analyzer">
       <form aria-label="Email analyzer" onSubmit={submit} noValidate>
         <label className="analyzer-title" htmlFor="email-content">Paste or import an email</label>
-        <p className="analyzer-intro">Paste the sender, subject, message, and visible links—or import a small .eml file.</p>
+        <p className="analyzer-intro">Paste the sender, subject, message, and visible links—or import an .eml file up to 15 MB.</p>
         <div className="email-import">
           <input
             ref={fileInputRef}
@@ -105,7 +105,7 @@ export default function EmailAnalyzer() {
           <label className="email-import-button" htmlFor="email-file" aria-disabled={isLoading || isReadingFile}>
             <UploadIcon /> {isReadingFile ? "Reading file…" : "Choose .eml file"}
           </label>
-          <span className="email-import-help">Read on this device · 50 KB max</span>
+          <span className="email-import-help">Read on this device · 15 MB max · Larger files may take a few seconds</span>
         </div>
         {selectedFile && (
           <div className="email-file-chip" aria-live="polite">
@@ -125,11 +125,11 @@ export default function EmailAnalyzer() {
             </dl>
             {selectedFile.attachments.length > 0 && (
               <div className="email-attachment-notice" role="note">
-                <strong>{selectedFile.attachments.length} attachment{selectedFile.attachments.length === 1 ? "" : "s"} detected · Contents not scanned</strong>
+                <strong>{selectedFile.attachments.length} attachment{selectedFile.attachments.length === 1 ? "" : "s"} · {formatEmlFileSize(selectedFile.attachments.reduce((total, attachment) => total + attachment.size, 0))} total · Contents not scanned</strong>
                 <ul>
                   {selectedFile.attachments.slice(0, 5).map((attachment, index) => {
                     const assessment = assessAttachment(attachment);
-                    return <li key={`${attachment.filename}-${index}`}><span>{attachment.filename}</span><small data-tone={assessment.severity}>{assessment.label}</small></li>;
+                    return <li key={`${attachment.filename}-${index}`}><span>{attachment.filename}<small>{formatEmlFileSize(attachment.size)}</small></span><small data-tone={assessment.severity}>{assessment.label}</small></li>;
                   })}
                 </ul>
                 {selectedFile.attachments.length > 5 && <span>And {selectedFile.attachments.length - 5} more attachment{selectedFile.attachments.length - 5 === 1 ? "" : "s"}</span>}

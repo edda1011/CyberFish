@@ -28,9 +28,10 @@ The first experience is a responsive website used on desktop or mobile when some
 - URL analysis combines local rules with optional Google Safe Browsing reputation checks.
 - Email text can be checked locally for common English scam patterns and suspicious link structure.
 - Email analysis runs through a no-store server endpoint. Local analysis is the default; email content is sent to Google Gemini only after the user explicitly enables AI analysis.
-- The email form can parse a small `.eml` file locally, extract readable headers and text, and safely convert HTML-only bodies to plain text. Attachment names are shown but attachment scanning remains outside the current version.
+- The email form can parse an `.eml` file locally, extract readable headers and text, and safely convert HTML-only bodies to plain text. Attachment names are shown but attachment scanning remains outside the current version.
 - Imported `.eml` files receive conservative header analysis after the user starts an analysis. Explicit SPF, DKIM, or DMARC failures and sender-domain inconsistencies may raise risk; missing authentication data does not raise the score. Reported passes are evidence, not a guarantee.
 - Attachment filenames and declared MIME types may produce conservative risk hints for executable, script, macro-enabled, disguised, or mismatched files. CyberFish does not open, upload, unpack, or scan attachment contents.
+- Imported `.eml` files may be up to 15 MB and are parsed locally. Attachment sizes and unusually high attachment counts may add limited risk context, while readable email text remains capped before it reaches the analysis API.
 - The service must not automatically open arbitrary user-provided websites or access private network addresses.
 - Submitted URLs, email content, and results are not stored by default.
 - The product must explain uncertainty and external-service failure instead of treating unknown results as safe.

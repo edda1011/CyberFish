@@ -3,6 +3,7 @@ import type { AnalysisEvidence } from "./analysis";
 export interface AttachmentMetadata {
   filename: string;
   mimeType: string;
+  size: number;
 }
 
 export type AttachmentRiskKind = "high_risk" | "macro" | "disguised" | "type_mismatch" | "archive" | "not_scanned";
@@ -15,6 +16,11 @@ export interface AttachmentAssessment {
 }
 
 type WeightedEvidence = AnalysisEvidence & { points: number };
+
+const MAX_ATTACHMENT_METADATA_BYTES = 15_000_000;
+const LARGE_ATTACHMENT_BYTES = 10_000_000;
+const MANY_ATTACHMENTS_COUNT = 5;
+const ATTACHMENT_CONTEXT_SCORE_CAP = 12;
 
 const DANGEROUS_EXTENSIONS = new Set(["exe", "scr", "js", "jse", "bat", "cmd", "ps1", "vbs", "vbe", "msi", "com", "hta", "jar", "lnk"]);
 const MACRO_EXTENSIONS = new Set(["docm", "xlsm", "pptm", "xlam", "dotm", "potm", "ppam"]);
@@ -62,7 +68,9 @@ export function isAttachmentMetadataList(value: unknown): value is AttachmentMet
     && value.length <= 50
     && value.every((item) => item && typeof item === "object"
       && typeof item.filename === "string" && item.filename.length > 0 && item.filename.length <= 120
-      && typeof item.mimeType === "string" && item.mimeType.length > 0 && item.mimeType.length <= 200);
+      && typeof item.mimeType === "string" && item.mimeType.length > 0 && item.mimeType.length <= 200
+      && typeof item.size === "number" && Number.isSafeInteger(item.size) && item.size >= 0 && item.size <= MAX_ATTACHMENT_METADATA_BYTES)
+    && value.reduce((total, item) => total + item.size, 0) <= MAX_ATTACHMENT_METADATA_BYTES;
 }
 
 export function analyzeAttachments(attachments: AttachmentMetadata[]) {
@@ -71,13 +79,37 @@ export function analyzeAttachments(attachments: AttachmentMetadata[]) {
     .filter(({ assessment }) => assessment.points > 0)
     .sort((a, b) => b.assessment.points - a.assessment.points);
 
-  const points = Math.min(45, risky.reduce((total, item) => total + item.assessment.points, 0));
+  const filenamePoints = Math.min(45, risky.reduce((total, item) => total + item.assessment.points, 0));
+  const largeAttachments = attachments.filter((attachment) => attachment.size > LARGE_ATTACHMENT_BYTES);
+  const contextPoints = Math.min(
+    ATTACHMENT_CONTEXT_SCORE_CAP,
+    (largeAttachments.length > 0 ? 8 : 0) + (attachments.length >= MANY_ATTACHMENTS_COUNT ? 6 : 0),
+  );
+  const points = filenamePoints + contextPoints;
   const evidence: WeightedEvidence[] = risky.slice(0, 3).map(({ attachment, assessment }) => ({
     points: assessment.points,
     title: assessment.kind === "macro" ? "Macro-enabled attachment" : assessment.kind === "type_mismatch" ? "Attachment type mismatch" : "High-risk attachment name",
     description: `${attachment.filename} is flagged from its filename or declared file type. CyberFish did not open or scan the attachment.`,
     severity: assessment.severity,
   }));
+
+  if (largeAttachments.length > 0) {
+    evidence.push({
+      points: 8,
+      title: "Large attachment included",
+      description: `${largeAttachments[0].filename} is over 10 MB. Large attachments are not automatically malicious, but unexpected files deserve extra care.`,
+      severity: "warning",
+    });
+  }
+
+  if (attachments.length >= MANY_ATTACHMENTS_COUNT) {
+    evidence.push({
+      points: contextPoints === 12 ? 4 : 6,
+      title: "Many attachments included",
+      description: `This email contains ${attachments.length} attachments. Confirm that you expected every file before opening any of them.`,
+      severity: "warning",
+    });
+  }
 
   if (attachments.length > 0 && risky.length === 0) {
     evidence.push({
