@@ -8,6 +8,7 @@ import {
   rateLimitHeaders,
 } from "../../../../lib/rate-limit";
 import { createSecurityLogger } from "../../../../lib/security-log";
+import { isEmailHeaderSignals, type EmailHeaderSignals } from "../../../../lib/email-header-analysis";
 
 const MAX_BODY_BYTES = 64 * 1024;
 
@@ -89,8 +90,17 @@ export async function POST(request: Request) {
     return errorResponse("INVALID_INPUT", "The AI analysis choice must be true or false.", 400);
   }
 
+  let emailHeaders: EmailHeaderSignals | undefined;
+  if ("emailHeaders" in body) {
+    if (!isEmailHeaderSignals(body.emailHeaders)) {
+      logSecurityEvent({ outcome: "validation_failed", status: 400, errorCode: "INVALID_INPUT" });
+      return errorResponse("INVALID_INPUT", "The imported email header data is invalid.", 400);
+    }
+    emailHeaders = body.emailHeaders;
+  }
+
   try {
-    const localResult = analyzeEmailLocally(body.content);
+    const localResult = analyzeEmailLocally(body.content, emailHeaders);
     const useAi = "useAi" in body && body.useAi === true;
 
     if (!useAi) {

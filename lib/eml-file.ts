@@ -1,5 +1,6 @@
 import PostalMime from "postal-mime";
 import type { Address, Mailbox } from "postal-mime";
+import type { EmailAuthenticationMethod, EmailAuthenticationStatus, EmailHeaderSignals } from "./email-header-analysis";
 
 export const MAX_EML_FILE_BYTES = 50_000;
 
@@ -21,6 +22,7 @@ export interface ParsedEmlContent {
   };
   attachments: ParsedEmlAttachment[];
   bodySource: "text" | "html";
+  headerSignals: EmailHeaderSignals;
 }
 
 export function validateEmlFile(file: Pick<ReadableEmlFile, "name" | "size">) {
@@ -108,6 +110,42 @@ function cleanAttachmentName(filename: string | null, index: number) {
   return cleaned.slice(0, 120);
 }
 
+function authenticationStatus(value: string, method: EmailAuthenticationMethod): EmailAuthenticationStatus | undefined {
+  const match = value.match(new RegExp(`(?:^|[;\\s])${method}=([a-z]+)`, "i"));
+  if (!match) return undefined;
+  const normalized = match[1].toLowerCase();
+  const known: EmailAuthenticationStatus[] = ["pass", "fail", "softfail", "neutral", "none", "temperror", "permerror"];
+  return known.includes(normalized as EmailAuthenticationStatus) ? normalized as EmailAuthenticationStatus : "unknown";
+}
+
+function extractAuthentication(headers: Array<{ key: string; value: string }>) {
+  const values = headers.filter(({ key }) => key === "authentication-results").map(({ value }) => value);
+  const receivedSpf = headers.find(({ key }) => key === "received-spf")?.value;
+  const authentication: EmailHeaderSignals["authentication"] = {};
+
+  for (const method of ["spf", "dkim", "dmarc"] as const) {
+    for (const value of values) {
+      const status = authenticationStatus(value, method);
+      if (status) {
+        authentication[method] = status;
+        break;
+      }
+    }
+  }
+
+  if (!authentication.spf && receivedSpf) {
+    const match = receivedSpf.match(/^\s*([a-z]+)/i);
+    if (match) {
+      const status = match[1].toLowerCase();
+      authentication.spf = ["pass", "fail", "softfail", "neutral", "none", "temperror", "permerror"].includes(status)
+        ? status as EmailAuthenticationStatus
+        : "unknown";
+    }
+  }
+
+  return authentication;
+}
+
 export async function parseEmlContent(rawEmail: string): Promise<ParsedEmlContent> {
   let parsed;
 
@@ -139,6 +177,15 @@ export async function parseEmlContent(rawEmail: string): Promise<ParsedEmlConten
     date: cleanHeader(parsed.headers.find((header) => header.key === "date")?.value ?? parsed.date),
   };
 
+  const fromMailbox = mailboxes(parsed.from ? [parsed.from] : undefined)[0];
+  const headerSignals: EmailHeaderSignals = {
+    fromAddress: cleanHeader(fromMailbox?.address),
+    fromName: cleanHeader(fromMailbox?.name),
+    replyToAddresses: mailboxes(parsed.replyTo).map(({ address }) => address).filter(Boolean).slice(0, 10),
+    messageId: cleanHeader(parsed.messageId),
+    authentication: extractAuthentication(parsed.headers),
+  };
+
   const headerLines = [
     metadata.from && `From: ${metadata.from}`,
     metadata.replyTo && `Reply-To: ${metadata.replyTo}`,
@@ -163,6 +210,7 @@ export async function parseEmlContent(rawEmail: string): Promise<ParsedEmlConten
       mimeType: cleanHeader(attachment.mimeType) ?? "unknown type",
     })),
     bodySource: plainBody ? "text" : "html",
+    headerSignals,
   };
 }
 

@@ -64,7 +64,7 @@ export default function EmailAnalyzer() {
       const response = await fetch("/api/analyze/email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: value, useAi }),
+        body: JSON.stringify({ content: value, useAi, ...(selectedFile ? { emailHeaders: selectedFile.headerSignals } : {}) }),
         cache: "no-store",
         signal: controller.signal,
       });

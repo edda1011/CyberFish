@@ -154,11 +154,32 @@ describe("email analysis API", () => {
     expect(result.aiAnalysis.message).toContain("local analysis is still complete");
   });
 
+  it("merges validated imported-email header findings", async () => {
+    const response = await analyzeEmail(request(
+      "/api/analyze/email",
+      JSON.stringify({
+        content: "Please review this ordinary account notice.",
+        emailHeaders: {
+          fromAddress: "notice@example.com",
+          fromName: "Example",
+          replyToAddresses: [],
+          authentication: { dmarc: "fail" },
+        },
+      }),
+    ));
+    const result = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(result.score).toBeGreaterThanOrEqual(30);
+    expect(result.evidence.map((item: { title: string }) => item.title)).toContain("DMARC authentication failed");
+  });
+
   it.each([
     ["wrong content type", "{}", "text/plain", 415, "INVALID_CONTENT_TYPE"],
     ["invalid JSON", "not-json", "application/json", 400, "INVALID_JSON"],
     ["missing content", "{}", "application/json", 400, "INVALID_INPUT"],
     ["invalid AI choice", JSON.stringify({ content: "Hello", useAi: "yes" }), "application/json", 400, "INVALID_INPUT"],
+    ["invalid email headers", JSON.stringify({ content: "Hello", emailHeaders: { authentication: { spf: "invented" } } }), "application/json", 400, "INVALID_INPUT"],
   ])("rejects %s", async (_label, body, contentType, status, code) => {
     const response = await analyzeEmail(request("/api/analyze/email", body, contentType));
     const result = await response.json();

@@ -24,6 +24,24 @@ describe(".eml file import", () => {
     expect(result.bodySource).toBe("text");
   });
 
+  it("extracts structured identity and authentication header signals", async () => {
+    const result = await parseEmlContent([
+      "From: PayPal Security <notice@unrelated.example>",
+      "Reply-To: payment@another.example",
+      "Message-ID: <abc@mailer.example>",
+      "Authentication-Results: mx.example; spf=fail smtp.mailfrom=unrelated.example; dkim=pass; dmarc=fail",
+      "", "Review your account.",
+    ].join("\r\n"));
+
+    expect(result.headerSignals).toEqual({
+      fromAddress: "notice@unrelated.example",
+      fromName: "PayPal Security",
+      replyToAddresses: ["payment@another.example"],
+      messageId: "<abc@mailer.example>",
+      authentication: { spf: "fail", dkim: "pass", dmarc: "fail" },
+    });
+  });
+
   it("decodes base64 and quoted-printable message bodies", async () => {
     const base64 = await parseEmlContent("Content-Type: text/plain; charset=utf-8\nContent-Transfer-Encoding: base64\n\nUmV2aWV3IHlvdXIgYWNjb3VudC4=");
     const quotedPrintable = await parseEmlContent("Content-Type: text/plain; charset=utf-8\nContent-Transfer-Encoding: quoted-printable\n\nClick=20carefully=2E");

@@ -40,3 +40,4 @@ Use `npm run test:watch` while developing to rerun tests when files change.
 - Part 6C: Embedded-domain impersonation detection
 - Part 7A: Local `.eml` file import foundation
 - Part 7B: Safe MIME parsing and readable `.eml` extraction
+- Part 7C: Conservative `.eml` header and authentication analysis
