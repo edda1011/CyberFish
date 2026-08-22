@@ -1,6 +1,7 @@
 import { analyzeUrlLocally } from "./analyze-url";
 import type { AnalysisEvidence, EmailAnalysisResult, RiskLevel } from "./analysis";
 import { analyzeEmailHeaders, type EmailHeaderSignals } from "./email-header-analysis";
+import { analyzeAttachments, type AttachmentMetadata } from "./attachment-analysis";
 
 type WeightedEvidence = AnalysisEvidence & { points: number };
 
@@ -71,7 +72,7 @@ function extractUrls(input: string) {
     .slice(0, 10);
 }
 
-export function analyzeEmailLocally(input: string, headerSignals?: EmailHeaderSignals): EmailAnalysisResult {
+export function analyzeEmailLocally(input: string, headerSignals?: EmailHeaderSignals, attachments?: AttachmentMetadata[]): EmailAnalysisResult {
   const text = input.trim();
   if (!text) throw new Error("Paste the email text you want to check.");
   if (text.length > 50_000) throw new Error("The email is too long. Paste text under 50,000 characters.");
@@ -125,6 +126,12 @@ export function analyzeEmailLocally(input: string, headerSignals?: EmailHeaderSi
     findings.push(...headerResult.evidence);
   }
 
+  if (attachments) {
+    const attachmentResult = analyzeAttachments(attachments);
+    score += attachmentResult.points;
+    findings.push(...attachmentResult.evidence);
+  }
+
   if (findings.length === 0) {
     findings.push({
       points: 0,
@@ -152,6 +159,6 @@ export function analyzeEmailLocally(input: string, headerSignals?: EmailHeaderSi
     evidence,
     recommendations,
     detectedLinks,
-    disclaimer: "This local check looks for common English scam patterns, URL structure, and available imported-email headers. It does not guarantee that an email is safe.",
+    disclaimer: "This local check looks for common English scam patterns, URL structure, and available imported-email metadata. Attachment contents are not scanned, and the result does not guarantee that an email is safe.",
   };
 }

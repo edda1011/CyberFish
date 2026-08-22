@@ -4,6 +4,7 @@ import { ChangeEvent, FormEvent, useRef, useState } from "react";
 import type { EmailAnalysisResult } from "../../lib/analysis";
 import { formatEmlFileSize, readEmlFile } from "../../lib/eml-file";
 import type { ParsedEmlContent } from "../../lib/eml-file";
+import { assessAttachment } from "../../lib/attachment-analysis";
 import AnalysisResultView from "./analysis-result";
 
 const MailIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m4 7 8 6 8-6" /></svg>;
@@ -64,7 +65,7 @@ export default function EmailAnalyzer() {
       const response = await fetch("/api/analyze/email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: value, useAi, ...(selectedFile ? { emailHeaders: selectedFile.headerSignals } : {}) }),
+        body: JSON.stringify({ content: value, useAi, ...(selectedFile ? { emailHeaders: selectedFile.headerSignals, attachments: selectedFile.attachments } : {}) }),
         cache: "no-store",
         signal: controller.signal,
       });
@@ -124,8 +125,14 @@ export default function EmailAnalyzer() {
             </dl>
             {selectedFile.attachments.length > 0 && (
               <div className="email-attachment-notice" role="note">
-                <strong>{selectedFile.attachments.length} attachment{selectedFile.attachments.length === 1 ? "" : "s"} detected · Not scanned</strong>
-                <span>{selectedFile.attachments.slice(0, 5).map((attachment) => attachment.filename).join(", ")}{selectedFile.attachments.length > 5 ? `, and ${selectedFile.attachments.length - 5} more` : ""}</span>
+                <strong>{selectedFile.attachments.length} attachment{selectedFile.attachments.length === 1 ? "" : "s"} detected · Contents not scanned</strong>
+                <ul>
+                  {selectedFile.attachments.slice(0, 5).map((attachment, index) => {
+                    const assessment = assessAttachment(attachment);
+                    return <li key={`${attachment.filename}-${index}`}><span>{attachment.filename}</span><small data-tone={assessment.severity}>{assessment.label}</small></li>;
+                  })}
+                </ul>
+                {selectedFile.attachments.length > 5 && <span>And {selectedFile.attachments.length - 5} more attachment{selectedFile.attachments.length - 5 === 1 ? "" : "s"}</span>}
               </div>
             )}
           </div>

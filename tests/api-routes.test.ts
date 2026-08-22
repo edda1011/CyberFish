@@ -174,12 +174,24 @@ describe("email analysis API", () => {
     expect(result.evidence.map((item: { title: string }) => item.title)).toContain("DMARC authentication failed");
   });
 
+  it("merges validated attachment metadata findings", async () => {
+    const response = await analyzeEmail(request(
+      "/api/analyze/email",
+      JSON.stringify({ content: "Please review the attached file.", attachments: [{ filename: "invoice.pdf.exe", mimeType: "application/octet-stream" }] }),
+    ));
+    const result = await response.json();
+    expect(response.status).toBe(200);
+    expect(result.score).toBeGreaterThanOrEqual(30);
+    expect(result.evidence.map((item: { title: string }) => item.title)).toContain("High-risk attachment name");
+  });
+
   it.each([
     ["wrong content type", "{}", "text/plain", 415, "INVALID_CONTENT_TYPE"],
     ["invalid JSON", "not-json", "application/json", 400, "INVALID_JSON"],
     ["missing content", "{}", "application/json", 400, "INVALID_INPUT"],
     ["invalid AI choice", JSON.stringify({ content: "Hello", useAi: "yes" }), "application/json", 400, "INVALID_INPUT"],
     ["invalid email headers", JSON.stringify({ content: "Hello", emailHeaders: { authentication: { spf: "invented" } } }), "application/json", 400, "INVALID_INPUT"],
+    ["invalid attachments", JSON.stringify({ content: "Hello", attachments: [{ filename: "", mimeType: "application/pdf" }] }), "application/json", 400, "INVALID_INPUT"],
   ])("rejects %s", async (_label, body, contentType, status, code) => {
     const response = await analyzeEmail(request("/api/analyze/email", body, contentType));
     const result = await response.json();

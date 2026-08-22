@@ -1,15 +1,13 @@
 import PostalMime from "postal-mime";
 import type { Address, Mailbox } from "postal-mime";
 import type { EmailAuthenticationMethod, EmailAuthenticationStatus, EmailHeaderSignals } from "./email-header-analysis";
+import type { AttachmentMetadata } from "./attachment-analysis";
 
 export const MAX_EML_FILE_BYTES = 50_000;
 
 export type ReadableEmlFile = Pick<File, "name" | "size" | "text">;
 
-export interface ParsedEmlAttachment {
-  filename: string;
-  mimeType: string;
-}
+export interface ParsedEmlAttachment extends AttachmentMetadata {}
 
 export interface ParsedEmlContent {
   content: string;
@@ -205,7 +203,7 @@ export async function parseEmlContent(rawEmail: string): Promise<ParsedEmlConten
   return {
     content,
     metadata,
-    attachments: parsed.attachments.map((attachment, index) => ({
+    attachments: parsed.attachments.slice(0, 50).map((attachment, index) => ({
       filename: cleanAttachmentName(attachment.filename, index),
       mimeType: cleanHeader(attachment.mimeType) ?? "unknown type",
     })),

@@ -9,6 +9,7 @@ import {
 } from "../../../../lib/rate-limit";
 import { createSecurityLogger } from "../../../../lib/security-log";
 import { isEmailHeaderSignals, type EmailHeaderSignals } from "../../../../lib/email-header-analysis";
+import { isAttachmentMetadataList, type AttachmentMetadata } from "../../../../lib/attachment-analysis";
 
 const MAX_BODY_BYTES = 64 * 1024;
 
@@ -99,8 +100,17 @@ export async function POST(request: Request) {
     emailHeaders = body.emailHeaders;
   }
 
+  let attachments: AttachmentMetadata[] | undefined;
+  if ("attachments" in body) {
+    if (!isAttachmentMetadataList(body.attachments)) {
+      logSecurityEvent({ outcome: "validation_failed", status: 400, errorCode: "INVALID_INPUT" });
+      return errorResponse("INVALID_INPUT", "The imported attachment metadata is invalid.", 400);
+    }
+    attachments = body.attachments;
+  }
+
   try {
-    const localResult = analyzeEmailLocally(body.content, emailHeaders);
+    const localResult = analyzeEmailLocally(body.content, emailHeaders, attachments);
     const useAi = "useAi" in body && body.useAi === true;
 
     if (!useAi) {
