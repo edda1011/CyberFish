@@ -44,3 +44,4 @@ Use `npm run test:watch` while developing to rerun tests when files change.
 - Part 7D: Attachment filename and MIME-type risk hints
 - Part 7E: Attachment size and quantity risk hints
 - Part 7F: Safe email link details and copy controls
+- Part 8A1: Local QR image reader and safety boundaries
