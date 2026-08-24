@@ -31,6 +31,13 @@ export interface AnalysisResult extends BaseAnalysisResult {
 
 export interface EmailAnalysisResult extends BaseAnalysisResult {
   detectedLinks: string[];
+  detectedLinkCount: number;
+  detectedLinkDetails: Array<{
+    url: string;
+    hostname: string;
+    level: RiskLevel;
+    warnings: string[];
+  }>;
   aiAnalysis?: {
     status: "not_requested" | "completed" | "unavailable";
     provider: "gemini";

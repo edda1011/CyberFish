@@ -6,6 +6,7 @@ import { formatEmlFileSize, readEmlFile } from "../../lib/eml-file";
 import type { ParsedEmlContent } from "../../lib/eml-file";
 import { assessAttachment } from "../../lib/attachment-analysis";
 import AnalysisResultView from "./analysis-result";
+import EmailLinkList from "./email-link-list";
 
 const MailIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m4 7 8 6 8-6" /></svg>;
 const LockIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v2" /></svg>;
@@ -183,6 +184,7 @@ export default function EmailAnalyzer() {
         label={`${result.detectedLinks.length} link${result.detectedLinks.length === 1 ? "" : "s"} found`}
         ariaLabel="Email analysis result"
         showEvidenceSources
+        afterSummary={<EmailLinkList result={result} />}
         statusNotice={result.aiAnalysis?.status === "unavailable"
           ? { tone: "warning", text: result.aiAnalysis.message }
           : result.aiAnalysis?.status === "completed"

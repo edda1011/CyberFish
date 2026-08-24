@@ -69,7 +69,7 @@ function summaryFor(level: RiskLevel) {
 function extractUrls(input: string) {
   return [...new Set(input.match(/https?:\/\/[^\s<>"']+/gi) ?? [])]
     .map((url) => url.replace(/[),.;!?\]]+$/, ""))
-    .slice(0, 10);
+    .slice(0, 50);
 }
 
 export function analyzeEmailLocally(input: string, headerSignals?: EmailHeaderSignals, attachments?: AttachmentMetadata[]): EmailAnalysisResult {
@@ -86,13 +86,15 @@ export function analyzeEmailLocally(input: string, headerSignals?: EmailHeaderSi
     findings.push({ ...rule.evidence, points: rule.points });
   }
 
-  const detectedLinks = extractUrls(text);
+  const extractedLinks = extractUrls(text);
+  const validLinkResults: Array<{ url: string; result: ReturnType<typeof analyzeUrlLocally> }> = [];
   let highestUrlRisk = 0;
   let riskyLink = "";
 
-  for (const link of detectedLinks) {
+  for (const link of extractedLinks) {
     try {
       const linkResult = analyzeUrlLocally(link);
+      validLinkResults.push({ url: link, result: linkResult });
       if (linkResult.score > highestUrlRisk) {
         highestUrlRisk = linkResult.score;
         riskyLink = linkResult.hostname;
@@ -101,6 +103,17 @@ export function analyzeEmailLocally(input: string, headerSignals?: EmailHeaderSi
       // Ignore incomplete text fragments that only resemble URLs.
     }
   }
+
+  const detectedLinks = validLinkResults.slice(0, 10).map(({ url }) => url);
+  const detectedLinkDetails = validLinkResults.slice(0, 10).map(({ url, result }) => ({
+    url,
+    hostname: result.hostname,
+    level: result.level,
+    warnings: result.evidence
+      .filter((item) => item.severity !== "positive")
+      .map((item) => item.title)
+      .slice(0, 3),
+  }));
 
   if (highestUrlRisk > 0) {
     const linkPoints = Math.min(40, highestUrlRisk);
@@ -159,6 +172,8 @@ export function analyzeEmailLocally(input: string, headerSignals?: EmailHeaderSi
     evidence,
     recommendations,
     detectedLinks,
+    detectedLinkCount: validLinkResults.length,
+    detectedLinkDetails,
     disclaimer: "This local check looks for common English scam patterns, URL structure, and available imported-email metadata. Attachment contents are not scanned, and the result does not guarantee that an email is safe.",
   };
 }

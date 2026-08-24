@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { BaseAnalysisResult } from "../../lib/analysis";
 
 const StatusIcon = ({ positive }: { positive: boolean }) => positive
@@ -11,9 +12,10 @@ type AnalysisResultViewProps = {
   advisoryUrl?: string;
   showEvidenceSources?: boolean;
   statusNotice?: { tone: "info" | "warning"; text: string };
+  afterSummary?: ReactNode;
 };
 
-export default function AnalysisResultView({ result, label, ariaLabel, advisoryUrl, showEvidenceSources = false, statusNotice }: AnalysisResultViewProps) {
+export default function AnalysisResultView({ result, label, ariaLabel, advisoryUrl, showEvidenceSources = false, statusNotice, afterSummary }: AnalysisResultViewProps) {
   return (
     <section className={`live-result result-${result.level}`} aria-live="polite" aria-label={ariaLabel}>
       <div className="live-result-heading">
@@ -21,6 +23,7 @@ export default function AnalysisResultView({ result, label, ariaLabel, advisoryU
         <div><p>{label}</p><h2>{result.summary}</h2></div>
       </div>
       {statusNotice && <p className={`result-status result-status-${statusNotice.tone}`}>{statusNotice.text}</p>}
+      {afterSummary}
       <ul>
         {result.evidence.map((item, index) => <li className={item.severity} key={`${item.source ?? "local"}-${item.title}-${index}`}><span><StatusIcon positive={item.severity === "positive"} /></span><div><strong>{item.title}{showEvidenceSources && <em className={`evidence-source evidence-source-${item.source ?? "local"}`}>{item.source === "ai" ? "AI-assisted" : "Local"}</em>}</strong><small>{item.description}</small></div></li>)}
       </ul>

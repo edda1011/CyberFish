@@ -32,6 +32,7 @@ The first experience is a responsive website used on desktop or mobile when some
 - Imported `.eml` files receive conservative header analysis after the user starts an analysis. Explicit SPF, DKIM, or DMARC failures and sender-domain inconsistencies may raise risk; missing authentication data does not raise the score. Reported passes are evidence, not a guarantee.
 - Attachment filenames and declared MIME types may produce conservative risk hints for executable, script, macro-enabled, disguised, or mismatched files. CyberFish does not open, upload, unpack, or scan attachment contents.
 - Imported `.eml` files may be up to 15 MB and are parsed locally. Attachment sizes and unusually high attachment counts may add limited risk context, while readable email text remains capped before it reaches the analysis API.
+- Email analysis results list detected web addresses as non-clickable text with their real hostname, local structural risk, and a copy control. CyberFish does not open the listed destinations.
 - The service must not automatically open arbitrary user-provided websites or access private network addresses.
 - Submitted URLs, email content, and results are not stored by default.
 - The product must explain uncertainty and external-service failure instead of treating unknown results as safe.

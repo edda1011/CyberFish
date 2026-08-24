@@ -14,6 +14,8 @@ describe("local email analysis", () => {
     expect(result.level).toBe("low");
     expect(result.score).toBe(0);
     expect(result.detectedLinks).toEqual([]);
+    expect(result.detectedLinkCount).toBe(0);
+    expect(result.detectedLinkDetails).toEqual([]);
   });
 
   it("detects urgent pressure", () => {
@@ -50,8 +52,27 @@ describe("local email analysis", () => {
     const result = analyzeEmailLocally("Review your account at http://192.0.2.10/login now.");
 
     expect(result.detectedLinks).toEqual(["http://192.0.2.10/login"]);
+    expect(result.detectedLinkCount).toBe(1);
+    expect(result.detectedLinkDetails).toEqual([
+      expect.objectContaining({
+        url: "http://192.0.2.10/login",
+        hostname: "192.0.2.10",
+        level: expect.any(String),
+        warnings: expect.arrayContaining(["IP address instead of a domain"]),
+      }),
+    ]);
     expect(result.score).toBeGreaterThan(0);
     expect(result.evidence.map((item) => item.title)).toContain("Suspicious link structure");
+  });
+
+  it("shows ten unique link details while retaining the total link count", () => {
+    const links = Array.from({ length: 12 }, (_, index) => `https://example${index}.com/path`).join(" ");
+    const result = analyzeEmailLocally(links);
+
+    expect(result.detectedLinkCount).toBe(12);
+    expect(result.detectedLinks).toHaveLength(10);
+    expect(result.detectedLinkDetails).toHaveLength(10);
+    expect(new Set(result.detectedLinkDetails.map((link) => link.url)).size).toBe(10);
   });
 
   it("rejects empty and oversized email text", () => {
