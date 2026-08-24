@@ -47,3 +47,4 @@ Use `npm run test:watch` while developing to rerun tests when files change.
 - Part 8A1: Local QR image reader and safety boundaries
 - Part 8A2: Local QR image selection, validation, preview, and removal
 - Part 8A3: Local QR decoding, content display, and copy controls
+- Part 8A4: Explicit URL analysis for decoded QR links
