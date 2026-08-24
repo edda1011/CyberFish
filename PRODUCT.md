@@ -102,3 +102,35 @@ The Gemini model name is server-configurable so a model can be changed without a
 - Confirm missing keys, timeouts, provider errors, malformed JSON, and unexpected categories return the local result with an AI-unavailable state.
 - Confirm local high-risk evidence cannot be weakened by Gemini output.
 - Confirm request limits, no-store headers, privacy copy, keyboard interaction, loading state, and mobile layout continue to work.
+
+## QR Code Image Analysis
+
+- The homepage analyzer adds a third `Scan a QR code` tab alongside URL and email analysis.
+- Users can select one PNG, JPG/JPEG, or WebP image up to 10 MB. Camera capture and clipboard image paste are outside Part 8A.
+- ZXing runs entirely in the browser to decode the selected image. The image, filename, preview, and decoded content are not sent to the server, stored, or logged.
+- The interface shows a local preview, filename, file size, decoding state, decoded content, and a `Remove` control. Removing or replacing the image clears its preview, decoded content, errors, and any URL analysis result.
+
+### Decoded content and URL analysis
+
+- Decoded QR content is displayed as non-clickable text with a `Copy content` control.
+- Only valid HTTP and HTTPS URLs receive a hostname label and an `Analyze this link` action.
+- URL analysis begins only after the user selects `Analyze this link` and reuses the existing protected `/api/analyze/url` endpoint and result interface.
+- CyberFish never opens the decoded destination automatically.
+- Non-URL content, including Wi-Fi, contact, `javascript:`, `data:`, and `file:` payloads, remains visible and copyable but cannot be submitted to URL analysis.
+
+### Safety and lifecycle
+
+- The client validates both the declared image MIME type and file extension before decoding.
+- Images over 10 MB are rejected. Oversized pixel dimensions are reduced locally before decoding to bound memory use.
+- Decoded content has a fixed length limit. Empty or excessive payloads produce a clear error and are not analyzed.
+- Preview object URLs are revoked when an image is removed, replaced, or the component unmounts.
+- Errors distinguish unsupported files, excessive size, unreadable images, missing QR codes, empty QR content, and URL-analysis failures, and give the user a recovery step.
+
+### Verification
+
+- Test PNG, JPG/JPEG, and WebP images containing valid URLs, suspicious URLs, ordinary text, and no QR code.
+- Test unsupported and disguised file types, files over 10 MB, excessive image dimensions, empty payloads, and excessive decoded content.
+- Confirm that images are decoded locally and never included in API requests or privacy-safe logs.
+- Confirm that URL analysis is not requested before explicit user action and that the existing URL endpoint and result UI are reused afterward.
+- Confirm remove, replace, copy feedback, keyboard operation, focus states, mobile layout, and long-content wrapping.
+- Confirm all existing URL, email, threat-intelligence, and API protection tests continue to pass.
