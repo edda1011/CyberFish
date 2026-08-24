@@ -79,6 +79,16 @@ export function validateQrContent(content: string) {
   return cleaned;
 }
 
+export function getQrHttpUrlDetails(content: string) {
+  try {
+    const url = new URL(content);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
+    return { hostname: url.hostname, url: url.href };
+  } catch {
+    return null;
+  }
+}
+
 export function decodeQrCanvas(
   canvas: HTMLCanvasElement,
   decoder: QrCanvasDecoder = new BrowserQRCodeReader(),

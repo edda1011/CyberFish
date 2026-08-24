@@ -45,3 +45,5 @@ Use `npm run test:watch` while developing to rerun tests when files change.
 - Part 7E: Attachment size and quantity risk hints
 - Part 7F: Safe email link details and copy controls
 - Part 8A1: Local QR image reader and safety boundaries
+- Part 8A2: Local QR image selection, validation, preview, and removal
+- Part 8A3: Local QR decoding, content display, and copy controls

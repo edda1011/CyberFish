@@ -6,6 +6,7 @@ import {
   QrImageError,
   boundedQrImageDimensions,
   decodeQrCanvas,
+  getQrHttpUrlDetails,
   validateQrContent,
   validateQrImageFile,
 } from "../lib/qr-image";
@@ -65,6 +66,17 @@ describe("QR image safety boundaries", () => {
   it("decodes a canvas without opening or fetching the result", () => {
     const decoder = { decodeFromCanvas: () => ({ getText: () => "https://example.com/account" }) };
     expect(decodeQrCanvas({} as HTMLCanvasElement, decoder)).toBe("https://example.com/account");
+  });
+
+  it("recognizes only HTTP and HTTPS content as an analyzable URL", () => {
+    expect(getQrHttpUrlDetails("https://example.com/account?from=qr")).toEqual({
+      hostname: "example.com",
+      url: "https://example.com/account?from=qr",
+    });
+    expect(getQrHttpUrlDetails("http://192.0.2.1/login")?.hostname).toBe("192.0.2.1");
+    expect(getQrHttpUrlDetails("WIFI:T:WPA;S:Coffee;P:secret;;")).toBeNull();
+    expect(getQrHttpUrlDetails("javascript:alert(1)")).toBeNull();
+    expect(getQrHttpUrlDetails("not a URL")).toBeNull();
   });
 
   it("normalizes decoder failures into a recoverable no-code error", () => {
