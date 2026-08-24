@@ -2,6 +2,16 @@
 
 CyberFish is a phishing URL and email analyzer built with Next.js and TypeScript.
 
+It can check web addresses, inspect pasted or imported email content, and read QR codes from images without automatically opening their destinations.
+
+## QR code analysis
+
+- Choose one PNG, JPG/JPEG, or WebP image up to 10 MB.
+- The image is decoded locally in your browser and is not uploaded or stored by CyberFish.
+- Decoded content is shown as non-clickable text and can be copied.
+- HTTP and HTTPS links are analyzed only after you explicitly choose `Analyze this link`.
+- Camera capture and clipboard image paste are not included yet, and successful decoding depends on image clarity.
+
 ## Local development
 
 ```bash
@@ -48,3 +58,4 @@ Use `npm run test:watch` while developing to rerun tests when files change.
 - Part 8A2: Local QR image selection, validation, preview, and removal
 - Part 8A3: Local QR decoding, content display, and copy controls
 - Part 8A4: Explicit URL analysis for decoded QR links
+- Part 8A5: QR accessibility, responsive QA, and documentation

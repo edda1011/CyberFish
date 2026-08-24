@@ -12,7 +12,7 @@ CyberFish is primarily for ordinary consumers who receive a suspicious link or e
 
 ## Product Purpose
 
-CyberFish helps people assess suspicious URLs and email text. It returns an understandable risk level, a 0–100 score, visible evidence, and practical next steps. Success means helping someone make a safer decision without presenting any result as an absolute guarantee.
+CyberFish helps people assess suspicious URLs, email content, and links encoded in QR images. It returns an understandable risk level, a 0–100 score, visible evidence, and practical next steps. Success means helping someone make a safer decision without presenting any result as an absolute guarantee.
 
 ## Positioning
 
@@ -24,7 +24,7 @@ The first experience is a responsive website used on desktop or mobile when some
 
 ## Capabilities and Constraints
 
-- The MVP will analyze URLs and plain-text email content.
+- The MVP analyzes URLs, plain-text or imported email content, and QR code images selected by the user.
 - URL analysis combines local rules with optional Google Safe Browsing reputation checks.
 - Email text can be checked locally for common English scam patterns and suspicious link structure.
 - Email analysis runs through a no-store server endpoint. Local analysis is the default; email content is sent to Google Gemini only after the user explicitly enables AI analysis.
@@ -36,7 +36,7 @@ The first experience is a responsive website used on desktop or mobile when some
 - The service must not automatically open arbitrary user-provided websites or access private network addresses.
 - Submitted URLs, email content, and results are not stored by default.
 - The product must explain uncertainty and external-service failure instead of treating unknown results as safe.
-- Accounts, saved history, attachment uploads, and automatic page opening are outside the first version.
+- Accounts, saved history, attachment-content scanning, camera capture, clipboard image paste, and automatic page opening are outside the first version.
 
 ## Brand Commitments
 

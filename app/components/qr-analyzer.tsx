@@ -93,6 +93,7 @@ export default function QrAnalyzer() {
     setSelectedImage(null);
     setError("");
     if (fileInputRef.current) fileInputRef.current.value = "";
+    requestAnimationFrame(() => fileInputRef.current?.focus());
   }
 
   function handlePreviewError() {
@@ -190,8 +191,8 @@ export default function QrAnalyzer() {
         id="qr-image-file"
         type="file"
         accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
-        aria-labelledby="qr-analyzer-title"
-        aria-describedby={error ? "qr-image-error" : "qr-image-help"}
+        aria-label="Choose a QR code image"
+        aria-describedby={error ? "qr-image-help qr-image-error" : "qr-image-help"}
         aria-invalid={Boolean(error)}
         onChange={chooseImage}
       />
@@ -223,6 +224,7 @@ export default function QrAnalyzer() {
             <span><strong id="qr-content-title">Content found</strong><small>{urlDetails ? `Web address · ${urlDetails.hostname}` : "Text or other QR content"}</small></span>
             <button type="button" onClick={copyContent}><CopyIcon /> {copyState === "copied" ? "Copied" : "Copy content"}</button>
           </div>
+          <span className="visually-hidden" role="status">{copyState === "copied" ? "QR content copied to the clipboard." : ""}</span>
           <code>{decodedContent}</code>
           {urlDetails && <p>This looks like a web address. CyberFish has not opened or analyzed it.</p>}
           {copyState === "error" && <p className="qr-copy-error" role="alert">Could not copy automatically. Select the content and copy it manually.</p>}
