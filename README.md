@@ -59,3 +59,8 @@ Use `npm run test:watch` while developing to rerun tests when files change.
 - Part 8A3: Local QR decoding, content display, and copy controls
 - Part 8A4: Explicit URL analysis for decoded QR links
 - Part 8A5: QR accessibility, responsive QA, and documentation
+- Part 9A: Guided spotlight hero foundation
+- Part 9B: Analyzer controls, transitions, and state feedback
+- Part 9C: Readable staged analysis results
+- Part 9D: Supporting sections and footer refinement
+- Part 9E: Responsive, accessibility, motion, and regression QA
