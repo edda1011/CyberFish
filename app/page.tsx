@@ -18,6 +18,7 @@ export default function Home() {
   return (
     <main id="top">
       <section className="ocean-shell">
+        <div className="guided-spotlight" aria-hidden="true" />
         <div className="sonar" aria-hidden="true"><span /><span /><span /><i /></div>
         <header className="site-header">
           <a className="brand" href="#top" aria-label="CyberFish home"><BrandMark /><span>CyberFish</span></a>
@@ -31,8 +32,8 @@ export default function Home() {
 
         <div className="hero">
           <div className="hero-copy">
-            <h1>Not sure about a link?<br /><span>Check it before you open it.</span></h1>
-            <p>CyberFish helps you spot phishing and scams, then explains what to do next in plain English.</p>
+            <h1>Pause. Check.<br /><span>Decide safely.</span></h1>
+            <p>CyberFish explains suspicious links, emails, and QR codes in plain English before you act.</p>
             <div className="hero-privacy"><span><LockIcon /></span><div><strong>Private by default</strong><small>Nothing you check is saved.</small></div></div>
           </div>
 
