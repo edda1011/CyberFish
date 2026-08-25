@@ -24,7 +24,7 @@ export default function AnalyzerSwitcher() {
 
   return (
     <div className="analyzer-card" id="analyzer">
-      <div className="analyzer-tabs" role="tablist" aria-label="Choose what to analyze">
+      <div className="analyzer-tabs" data-mode={mode} role="tablist" aria-label="Choose what to analyze">
         <button
           type="button"
           role="tab"
@@ -63,13 +63,13 @@ export default function AnalyzerSwitcher() {
         </button>
       </div>
 
-      <div id="url-panel" role="tabpanel" aria-labelledby="url-tab" hidden={mode !== "url"}>
+      <div className="analyzer-panel" id="url-panel" role="tabpanel" aria-labelledby="url-tab" hidden={mode !== "url"}>
         <UrlAnalyzer />
       </div>
-      <div id="email-panel" role="tabpanel" aria-labelledby="email-tab" hidden={mode !== "email"}>
+      <div className="analyzer-panel" id="email-panel" role="tabpanel" aria-labelledby="email-tab" hidden={mode !== "email"}>
         <EmailAnalyzer />
       </div>
-      <div id="qr-panel" role="tabpanel" aria-labelledby="qr-tab" hidden={mode !== "qr"}>
+      <div className="analyzer-panel" id="qr-panel" role="tabpanel" aria-labelledby="qr-tab" hidden={mode !== "qr"}>
         <QrAnalyzer />
       </div>
     </div>
