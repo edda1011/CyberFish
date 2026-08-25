@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { BaseAnalysisResult } from "../../lib/analysis";
 
 const StatusIcon = ({ positive }: { positive: boolean }) => positive
@@ -19,7 +19,15 @@ export default function AnalysisResultView({ result, label, ariaLabel, advisoryU
   return (
     <section className={`live-result result-${result.level}`} aria-live="polite" aria-label={ariaLabel}>
       <div className="live-result-heading">
-        <div><span>{result.level} risk</span><strong>{result.score}<small>/100</small></strong></div>
+        <div
+          className="risk-score-ring"
+          role="img"
+          aria-label={`${result.level} risk, ${result.score} out of 100`}
+          style={{ "--risk-progress": `${result.score}%` } as CSSProperties}
+        >
+          <span className="risk-label" aria-hidden="true">{result.level} risk</span>
+          <strong aria-hidden="true">{result.score}<small>/100</small></strong>
+        </div>
         <div><p>{label}</p><h2>{result.summary}</h2></div>
       </div>
       {statusNotice && <p className={`result-status result-status-${statusNotice.tone}`}>{statusNotice.text}</p>}
