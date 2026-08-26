@@ -77,8 +77,18 @@ export default function Home() {
 
       <footer>
         <a className="brand footer-brand" href="#top"><BrandMark /><span>CyberFish</span></a>
-        <p>Clear evidence. Safer next steps.</p>
-        <div className="footer-links"><a href="#how-it-works">How it works</a><a href="#privacy">Privacy</a><span>URL · Email · QR analysis</span></div>
+        <p className="footer-tagline">Clear evidence. Safer next steps.</p>
+        <div className="footer-meta">
+          <nav className="footer-links" aria-label="Footer navigation">
+            <a href="#how-it-works">How it works</a>
+            <a href="#privacy">Privacy</a>
+          </nav>
+          <p className="footer-legal">
+            <span>© 2026 edda1011</span>
+            <span aria-hidden="true">·</span>
+            <a href="https://github.com/edda1011/CyberFish/blob/main/LICENSE">MIT License</a>
+          </p>
+        </div>
       </footer>
     </main>
   );
