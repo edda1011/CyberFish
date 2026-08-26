@@ -4,6 +4,20 @@ CyberFish is a phishing URL and email analyzer built with Next.js and TypeScript
 
 It can check web addresses, inspect pasted or imported email content, and read QR codes from images without automatically opening their destinations.
 
+## Live demo
+
+[Open CyberFish](https://cyber-fish-pi.vercel.app)
+
+The public demo is deployed on Vercel from the `main` branch. Analysis results provide guidance rather than a guarantee that a link or email is safe.
+
+## Privacy
+
+- CyberFish does not intentionally store submitted URLs, email content, uploaded `.eml` files, or analysis results.
+- URL reputation checks send the submitted address to Google Safe Browsing.
+- Email text is sent to Google Gemini only when `Use AI analysis` is enabled.
+- QR images are decoded locally in the browser and are not uploaded by CyberFish.
+- API keys are server-side environment variables and are not committed to this repository.
+
 ## QR code analysis
 
 - Choose one PNG, JPG/JPEG, or WebP image up to 10 MB.
@@ -64,3 +78,4 @@ Use `npm run test:watch` while developing to rerun tests when files change.
 - Part 9C: Readable staged analysis results
 - Part 9D: Supporting sections and footer refinement
 - Part 9E: Responsive, accessibility, motion, and regression QA
+- Part 10: Vercel production deployment and live-site verification
