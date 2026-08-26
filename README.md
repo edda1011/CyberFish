@@ -95,3 +95,7 @@ npm run build
 The public demo is deployed on Vercel from the `main` branch. After a commit is pushed to GitHub, Vercel builds the project and promotes a successful deployment to Production automatically.
 
 Production secrets must be configured in Vercel Environment Variables rather than stored in GitHub.
+
+## License
+
+CyberFish is available under the [MIT License](LICENSE).
