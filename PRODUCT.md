@@ -106,7 +106,7 @@ The Gemini model name is server-configurable so a model can be changed without a
 ## QR Code Image Analysis
 
 - The homepage analyzer adds a third `Scan a QR code` tab alongside URL and email analysis.
-- Users can select one PNG, JPG/JPEG, or WebP image up to 10 MB. Camera capture and clipboard image paste are outside Part 8A.
+- Users can select one PNG, JPG/JPEG, or WebP image up to 10 MB. Camera capture and clipboard image paste are outside the initial QR image workflow.
 - ZXing runs entirely in the browser to decode the selected image. The image, filename, preview, and decoded content are not sent to the server, stored, or logged.
 - The interface shows a local preview, filename, file size, decoding state, decoded content, and a `Remove` control. Removing or replacing the image clears its preview, decoded content, errors, and any URL analysis result.
 
@@ -142,7 +142,7 @@ The Gemini model name is server-configurable so a model can be changed without a
 - Publishes CyberFish as a free, non-commercial public demo on the Vercel Hobby plan.
 - Vercel imports the existing `edda1011/CyberFish` GitHub repository and treats `main` as the production branch.
 - Every push to `main` triggers a new production build and deployment. The application remains a single Next.js project with its existing URL and email API routes.
-- The first release uses the generated `*.vercel.app` address. A custom domain, paid hosting, analytics, accounts, and persistent storage are outside Part 10.
+- The first release uses the generated `*.vercel.app` address. A custom domain, paid hosting, analytics, accounts, and persistent storage are outside the initial deployment scope.
 
 ### Production configuration
 
@@ -159,7 +159,7 @@ The Gemini model name is server-configurable so a model can be changed without a
 - Gemini remains off by default and receives email text only after explicit user opt-in.
 - QR images continue to be decoded locally in the browser and are never uploaded to Vercel.
 - The current in-memory rate limiter is acceptable as baseline protection for a small demo, but it is not a strict global limit across multiple serverless instances. A shared rate-limit store is required before sustained or higher-risk public traffic.
-- Vercel Analytics is not enabled during Part 10, avoiding additional tracking and scope.
+- Vercel Analytics is not enabled for the initial deployment, avoiding additional tracking and scope.
 
 ### Delivery sequence
 
@@ -168,7 +168,7 @@ The Gemini model name is server-configurable so a model can be changed without a
 3. Configure the three production environment variables before the first public release.
 4. Deploy and review the build and function logs without exposing submitted content or secrets.
 5. Test the homepage, URL rules and reputation lookup, local and opted-in AI email analysis, QR decoding, invalid inputs, and mobile layout at the public address.
-6. Add the verified public URL and Part 10 progress to the README for a user-reviewed commit.
+6. Add the verified public URL and deployment notes to the README for a user-reviewed commit.
 
 ### Acceptance criteria
 

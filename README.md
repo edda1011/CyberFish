@@ -1,32 +1,55 @@
 # CyberFish
 
-CyberFish is a phishing URL and email analyzer built with Next.js and TypeScript.
+CyberFish is a privacy-conscious phishing analyzer built with Next.js and TypeScript. It helps people inspect suspicious links, emails, and QR codes before deciding what to do next.
 
-It can check web addresses, inspect pasted or imported email content, and read QR codes from images without automatically opening their destinations.
+[Open the live CyberFish demo](https://cyber-fish-pi.vercel.app)
 
-## Live demo
+> CyberFish provides evidence and practical guidance, not a guarantee that content is safe.
 
-[Open CyberFish](https://cyber-fish-pi.vercel.app)
+## Features
 
-The public demo is deployed on Vercel from the `main` branch. Analysis results provide guidance rather than a guarantee that a link or email is safe.
+- **Link analysis:** checks URL structure, HTTPS usage, public DNS destinations, domain registration age, embedded-domain impersonation patterns, and Google Safe Browsing reputation.
+- **Email analysis:** reviews pasted text or imported `.eml` files for common phishing language, suspicious links, email authentication signals, and attachment metadata.
+- **Optional AI assistance:** uses Google Gemini only when the user explicitly enables AI analysis. Local findings remain authoritative and available if Gemini cannot respond.
+- **QR code analysis:** decodes PNG, JPG/JPEG, and WebP images locally in the browser without opening the destination automatically.
+- **Clear results:** presents a risk level, a 0–100 score, visible evidence, and practical next steps in plain English.
 
-## Privacy
+## How analysis works
 
-- CyberFish does not intentionally store submitted URLs, email content, uploaded `.eml` files, or analysis results.
+CyberFish validates the input first, applies local detection rules, and then uses the relevant external service when configured. Link destinations are not automatically opened. External-service failures are shown as unavailable or incomplete checks rather than being treated as proof of safety.
+
+The internal API endpoints are:
+
+- `POST /api/analyze/url`
+- `POST /api/analyze/email`
+
+Both endpoints return a consistent analysis result containing the risk level, score, evidence, and recommended actions.
+
+## Privacy and safety
+
+- CyberFish does not intentionally store submitted URLs, email content, imported `.eml` files, QR images, or analysis results.
 - URL reputation checks send the submitted address to Google Safe Browsing.
 - Email text is sent to Google Gemini only when `Use AI analysis` is enabled.
-- QR images are decoded locally in the browser and are not uploaded by CyberFish.
-- API keys are server-side environment variables and are not committed to this repository.
+- QR images are decoded locally and are not uploaded by CyberFish.
+- Security logs contain anonymous operational information and do not include submitted content, complete IP addresses, API keys, or raw provider errors.
+- API keys remain in server-side environment variables and are never committed to the repository.
 
-## QR code analysis
+## QR code limitations
 
-- Choose one PNG, JPG/JPEG, or WebP image up to 10 MB.
-- The image is decoded locally in your browser and is not uploaded or stored by CyberFish.
-- Decoded content is shown as non-clickable text and can be copied.
-- HTTP and HTTPS links are analyzed only after you explicitly choose `Analyze this link`.
-- Camera capture and clipboard image paste are not included yet, and successful decoding depends on image clarity.
+- Images must be PNG, JPG/JPEG, or WebP and no larger than 10 MB.
+- Decoded content is displayed as non-clickable text and can be copied.
+- HTTP and HTTPS destinations are analyzed only after the user selects `Analyze this link`.
+- Camera capture and clipboard image paste are not currently supported.
+- Successful decoding depends on image clarity and QR code quality.
 
 ## Local development
+
+Requirements:
+
+- Node.js
+- npm
+
+Install dependencies and start the development server:
 
 ```bash
 npm install
@@ -35,47 +58,40 @@ npm run dev
 
 Open `http://localhost:3001` in your browser.
 
-## Automated tests
+## Environment variables
+
+Copy `.env.example` to `.env.local` and provide only the services you want to enable:
+
+```env
+GOOGLE_SAFE_BROWSING_API_KEY=
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-3.5-flash
+```
+
+Never commit `.env.local` or paste API keys into issues, screenshots, or documentation.
+
+## Testing
+
+Run the automated test suite:
 
 ```bash
 npm test
 ```
 
-Use `npm run test:watch` while developing to rerun tests when files change.
+Run tests continuously while developing:
 
-## Current progress
+```bash
+npm run test:watch
+```
 
-- Part 1: Project foundation
-- Part 2: Responsive landing page UI
-- Part 3A: Interactive local URL analysis rules
-- Part 3B: Server-side URL analysis API
-- Part 3C: Google Safe Browsing threat-intelligence adapter
-- Part 4A: Email analyzer input UI
-- Part 4B: Local English email analysis rules
-- Part 4C: Protected server-side email analysis API
-- Part 4D: Optional Gemini-assisted email analysis
-- Part 5A: In-memory API rate limiting
-- Part 5B: Privacy-safe structured security logs
-- Part 5C1: Vitest foundation and local analysis tests
-- Part 5C2: Offline Gemini and AI result-merging tests
-- Part 5C3: API protection, rate-limit, and privacy-log tests
-- Part 6A: RDAP domain registration age checks
-- Part 6B: DNS and non-public network safety checks
-- Part 6C: Embedded-domain impersonation detection
-- Part 7A: Local `.eml` file import foundation
-- Part 7B: Safe MIME parsing and readable `.eml` extraction
-- Part 7C: Conservative `.eml` header and authentication analysis
-- Part 7D: Attachment filename and MIME-type risk hints
-- Part 7E: Attachment size and quantity risk hints
-- Part 7F: Safe email link details and copy controls
-- Part 8A1: Local QR image reader and safety boundaries
-- Part 8A2: Local QR image selection, validation, preview, and removal
-- Part 8A3: Local QR decoding, content display, and copy controls
-- Part 8A4: Explicit URL analysis for decoded QR links
-- Part 8A5: QR accessibility, responsive QA, and documentation
-- Part 9A: Guided spotlight hero foundation
-- Part 9B: Analyzer controls, transitions, and state feedback
-- Part 9C: Readable staged analysis results
-- Part 9D: Supporting sections and footer refinement
-- Part 9E: Responsive, accessibility, motion, and regression QA
-- Part 10: Vercel production deployment and live-site verification
+Create a production build:
+
+```bash
+npm run build
+```
+
+## Deployment
+
+The public demo is deployed on Vercel from the `main` branch. After a commit is pushed to GitHub, Vercel builds the project and promotes a successful deployment to Production automatically.
+
+Production secrets must be configured in Vercel Environment Variables rather than stored in GitHub.

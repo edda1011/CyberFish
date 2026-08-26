@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines the approved Part 9 UI and motion direction for CyberFish. It refines the existing ocean-intelligence identity without changing analysis logic, scores, APIs, privacy behavior, or product claims.
+This document defines the approved UI and motion direction for CyberFish. It refines the existing ocean-intelligence identity without changing analysis logic, scores, APIs, privacy behavior, or product claims.
 
 ## Experience Direction
 
@@ -92,7 +92,7 @@ Each implementation stage is reviewed by the user before the user creates its Gi
 
 ## Constraints
 
-- Do not add a third-party animation library for Part 9.
+- Do not add a third-party animation library for this interface refinement.
 - Do not modify analysis scoring, threat-intelligence logic, API contracts, logging, storage behavior, or privacy boundaries.
 - Do not represent low risk as a guarantee of safety.
 - Do not add fabricated claims, testimonials, certifications, or partner branding.

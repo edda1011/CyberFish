@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Part 5C adds fast, repeatable automated tests for CyberFish's existing analysis and protection logic. The tests should detect regressions before a commit without visiting submitted URLs or consuming Google API quota.
+The automated suite adds fast, repeatable tests for CyberFish's existing analysis and protection logic. The tests should detect regressions before a commit without visiting submitted URLs or consuming Google API quota.
 
 ## Scope
 
