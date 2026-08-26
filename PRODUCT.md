@@ -134,3 +134,48 @@ The Gemini model name is server-configurable so a model can be changed without a
 - Confirm that URL analysis is not requested before explicit user action and that the existing URL endpoint and result UI are reused afterward.
 - Confirm remove, replace, copy feedback, keyboard operation, focus states, mobile layout, and long-content wrapping.
 - Confirm all existing URL, email, threat-intelligence, and API protection tests continue to pass.
+
+## Vercel Public Demo Deployment
+
+### Scope and deployment model
+
+- Publishes CyberFish as a free, non-commercial public demo on the Vercel Hobby plan.
+- Vercel imports the existing `edda1011/CyberFish` GitHub repository and treats `main` as the production branch.
+- Every push to `main` triggers a new production build and deployment. The application remains a single Next.js project with its existing URL and email API routes.
+- The first release uses the generated `*.vercel.app` address. A custom domain, paid hosting, analytics, accounts, and persistent storage are outside Part 10.
+
+### Production configuration
+
+- `GOOGLE_SAFE_BROWSING_API_KEY` and `GEMINI_API_KEY` are added to the Vercel Production environment as separate sensitive variables.
+- `GEMINI_MODEL` is added as a non-secret Production variable.
+- API keys remain server-side and must never be committed, exposed through `NEXT_PUBLIC_` variables, returned in API responses, or included in logs.
+- `.env.local` remains local and ignored by Git. `.env.example` documents variable names without containing values.
+- Environment-variable changes require a new deployment before they affect the production site.
+
+### Runtime safety and failure behavior
+
+- Existing request-size limits, no-store responses, outbound timeouts, SSRF protections, privacy-safe logs, and API rate limits remain enabled.
+- External provider failure, timeout, invalid output, or quota exhaustion returns an understandable incomplete-analysis state and never converts an unknown result into a safe result.
+- Gemini remains off by default and receives email text only after explicit user opt-in.
+- QR images continue to be decoded locally in the browser and are never uploaded to Vercel.
+- The current in-memory rate limiter is acceptable as baseline protection for a small demo, but it is not a strict global limit across multiple serverless instances. A shared rate-limit store is required before sustained or higher-risk public traffic.
+- Vercel Analytics is not enabled during Part 10, avoiding additional tracking and scope.
+
+### Delivery sequence
+
+1. Verify a clean Git state, ignored secret files, automated tests, and a production build.
+2. Create a Vercel account with GitHub and import the CyberFish repository.
+3. Configure the three production environment variables before the first public release.
+4. Deploy and review the build and function logs without exposing submitted content or secrets.
+5. Test the homepage, URL rules and reputation lookup, local and opted-in AI email analysis, QR decoding, invalid inputs, and mobile layout at the public address.
+6. Add the verified public URL and Part 10 progress to the README for a user-reviewed commit.
+
+### Acceptance criteria
+
+- The production deployment builds successfully from `main` and receives a public `*.vercel.app` URL.
+- Desktop and mobile visitors can use URL, email, and QR analysis without installing software.
+- Google Safe Browsing and explicitly enabled Gemini analysis work with server-side production credentials.
+- Provider failures remain understandable and conservative, and no result is presented as a guarantee of safety.
+- API keys are absent from Git history, browser-delivered code, responses, and logs.
+- Submitted URLs, email content, QR content, full IP addresses, anonymous IP hashes, provider payloads, and raw error content are not retained in application logs.
+- README deployment documentation matches the verified production setup.
