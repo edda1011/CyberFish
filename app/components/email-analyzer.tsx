@@ -60,7 +60,7 @@ export default function EmailAnalyzer() {
     setIsLoading(true);
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10_000);
+    const timeout = setTimeout(() => controller.abort(), 15_000);
 
     try {
       const response = await fetch("/api/analyze/email", {

@@ -2,7 +2,7 @@ import { EMAIL_AI_CATEGORIES, parseEmailAiResult, type EmailAiResult } from "./e
 
 const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models";
 const DEFAULT_MODEL = "gemini-3.5-flash";
-const DEFAULT_TIMEOUT_MS = 6_000;
+const DEFAULT_TIMEOUT_MS = 12_000;
 
 export type GeminiUnavailableReason =
   | "not_configured"
