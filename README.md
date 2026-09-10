@@ -72,6 +72,8 @@ Never commit `.env.local` or paste API keys into issues, screenshots, or documen
 
 ## Testing
 
+The automated suite uses Vitest and controlled mocks for external providers, so it does not require real API keys, contact Google services, or consume API quota.
+
 Run the automated test suite:
 
 ```bash
