@@ -181,7 +181,7 @@ export default function EmailAnalyzer() {
       <p className="preview-note" id="email-help"><LockIcon /> {useAi ? "AI-assisted analysis · Not stored by CyberFish" : "Imported files stay on this device until you choose Analyze"}</p>
       {result && <AnalysisResultView
         result={result}
-        label={`${result.detectedLinks.length} link${result.detectedLinks.length === 1 ? "" : "s"} found`}
+        label={`${result.detectedLinkCount} link${result.detectedLinkCount === 1 ? "" : "s"} found`}
         ariaLabel="Email analysis result"
         showEvidenceSources
         afterSummary={<EmailLinkList result={result} />}

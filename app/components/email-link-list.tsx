@@ -38,7 +38,7 @@ export default function EmailLinkList({ result }: { result: EmailAnalysisResult 
           <h3 id="email-links-heading">Links found in this email</h3>
           <p>Addresses are shown as text and will not open when selected.</p>
         </div>
-        <span>{result.detectedLinkCount}</span>
+        <span>{result.detectedLinkDetails.length} shown</span>
       </div>
       <ol>
         {result.detectedLinkDetails.map((link, index) => {
@@ -49,7 +49,7 @@ export default function EmailLinkList({ result }: { result: EmailAnalysisResult 
                 <strong>{link.hostname}</strong>
                 <small data-level={link.level}>{link.level} risk</small>
               </div>
-              <code>{link.url}</code>
+              <code title={link.url}>{link.url}</code>
               <div className="email-link-meta">
                 <div>{link.warnings.length > 0
                   ? link.warnings.map((warning) => <span key={warning}>{warning}</span>)
